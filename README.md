@@ -1,6 +1,4 @@
-Weather
-=======
-
-Weather &amp; Tornadoes mod for Minecraft.
+Weather &amp; Tornadoes
+===================
 
 - Latest compiled against MCP/MinecraftForge build #301
