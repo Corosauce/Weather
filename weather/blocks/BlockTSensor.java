@@ -66,7 +66,7 @@ public class BlockTSensor extends Block
     }
 
     @Override
-    public boolean isIndirectlyPoweringTo(World var1, int var2, int var3, int var4, int var5)
+    public boolean isIndirectlyPoweringTo(IBlockAccess var1, int var2, int var3, int var4, int var5)
     {
         return var1.getBlockMetadata(var2, var3, var4) == 0 ? false : var5 > -1;
     }

@@ -104,7 +104,7 @@ public class ItemTornado extends Item
 		            pkt.data = bos.toByteArray();
 		            pkt.length = bos.size();
 		            //pkt.isChunkDataPacket = true;
-		            MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(pkt);
+		            MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayersInDimension(pkt, worldObj.provider.dimensionId);
 		            
 		            var2.weatherEffects.add(((Entity)var4));
 		        }

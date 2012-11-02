@@ -8,7 +8,7 @@ import java.io.DataOutputStream;
 import weather.storm.EntTornado;
 
 import net.minecraft.src.Entity;
-import net.minecraft.src.NetworkManager;
+import net.minecraft.src.INetworkManager;
 import net.minecraft.src.Packet250CustomPayload;
 import net.minecraft.src.World;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -22,7 +22,7 @@ public class WeatherPacketHandler implements IPacketHandler
     }
 
     @Override
-    public void onPacketData(NetworkManager manager, Packet250CustomPayload packet, Player player)
+    public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player player)
     {
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(packet.data));
 

@@ -374,18 +374,18 @@ public class WaveRenderer extends Render
         }*/
         int var10 = (par8 & 15) << 4;
         int var11 = par8 & 240;
-        double var12 = ((double)var10 + par1Block.minX * 16.0D) / 256.0D;
-        double var14 = ((double)var10 + par1Block.maxX * 16.0D - 0.01D) / 256.0D;
-        double var16 = ((double)var11 + par1Block.minZ * 16.0D) / 256.0D;
-        double var18 = ((double)var11 + par1Block.maxZ * 16.0D - 0.01D) / 256.0D;
+        double var12 = ((double)var10 + par1Block.func_83009_v() * 16.0D) / 256.0D;
+        double var14 = ((double)var10 + par1Block.func_83007_w() * 16.0D - 0.01D) / 256.0D;
+        double var16 = ((double)var11 + par1Block.func_83005_z() * 16.0D) / 256.0D;
+        double var18 = ((double)var11 + par1Block.func_83006_A() * 16.0D - 0.01D) / 256.0D;
 
-        if (par1Block.minX < 0.0D || par1Block.maxX > 1.0D)
+        if (par1Block.func_83009_v() < 0.0D || par1Block.func_83007_w() > 1.0D)
         {
             var12 = (double)(((float)var10 + 0.0F) / 256.0F);
             var14 = (double)(((float)var10 + 15.99F) / 256.0F);
         }
 
-        if (par1Block.minZ < 0.0D || par1Block.maxZ > 1.0D)
+        if (par1Block.func_83005_z() < 0.0D || par1Block.func_83006_A() > 1.0D)
         {
             var16 = (double)(((float)var11 + 0.0F) / 256.0F);
             var18 = (double)(((float)var11 + 15.99F) / 256.0F);
@@ -395,11 +395,11 @@ public class WaveRenderer extends Render
         double var22 = var12;
         double var24 = var16;
         double var26 = var18;
-        double var28 = par2 + par1Block.minX;
-        double var30 = par2 + par1Block.maxX;
-        double var32 = par4 + par1Block.maxY;
-        double var34 = par6 + par1Block.minZ;
-        double var36 = par6 + par1Block.maxZ;
+        double var28 = par2 + par1Block.func_83009_v();
+        double var30 = par2 + par1Block.func_83007_w();
+        double var32 = par4 + par1Block.func_83010_y();
+        double var34 = par6 + par1Block.func_83005_z();
+        double var36 = par6 + par1Block.func_83006_A();
         //Weather code change
         /*c_w_BlockWaveHelper.calcSide(par1Block);
         var30 += c_w_BlockWaveHelper.x;

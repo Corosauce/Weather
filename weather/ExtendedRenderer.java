@@ -87,8 +87,8 @@ public class ExtendedRenderer extends BaseMod
         {
             preInitConfig.load();
             
-            rainRate = preInitConfig.getOrCreateIntProperty("rainRate", Configuration.CATEGORY_ITEM, 50).getInt(50);
-            smoothRain = preInitConfig.getOrCreateBooleanProperty("smoothRain", Configuration.CATEGORY_GENERAL, true).getBoolean(true);
+            rainRate = preInitConfig.get(Configuration.CATEGORY_GENERAL, "rainRate", 50).getInt(50);
+            smoothRain = preInitConfig.get(Configuration.CATEGORY_GENERAL, "smoothRain", true).getBoolean(true);
             
             int wat = 0;
             

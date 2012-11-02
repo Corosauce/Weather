@@ -77,6 +77,8 @@ public class PhantomBlockRenderer extends Render
                 var17 = var21;
             }
         }
+        
+        a.func_83020_a(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
 
         var12.setColorOpaque_F(var15 * var8 * var14, var16 * var8 * var14, var17 * var8 * var14);
         this.a.renderBottomFace(var2, -0.5D, -0.5D, -0.5D, var2.getBlockTextureFromSideAndMetadata(0, var7));

@@ -63,7 +63,7 @@ import weather.worldObjects.EntWorm;
 import weather.worldObjects.ItemTornado;
 
 @NetworkMod(channels = { "StormData", "WindData", "Tornado" }, clientSideRequired = true, serverSideRequired = true, packetHandler = WeatherPacketHandler.class)
-@Mod(modid = "WeatherMod", name = "Weather and Tornadoes", version = "v1.22 for MC v1.3.2")
+@Mod(modid = "WeatherMod", name = "Weather and Tornadoes", version = "v1.22")
 
 public class WeatherMod implements Runnable
 {
@@ -617,62 +617,64 @@ public class WeatherMod implements Runnable
         {
             preInitConfig.load();
             
-            sensorID = preInitConfig.getOrCreateBlockIdProperty("sensorID", blockIndexID).getInt(blockIndexID++);
-            sirenID = preInitConfig.getOrCreateBlockIdProperty("sirenID", blockIndexID).getInt(blockIndexID++);
+            sensorID = preInitConfig.get(Configuration.CATEGORY_BLOCK, "sensorID", blockIndexID).getInt(blockIndexID++);
+            sirenID = preInitConfig.get(Configuration.CATEGORY_BLOCK, "sirenID", blockIndexID).getInt(blockIndexID++);
             
-            itemTornadoID = preInitConfig.getOrCreateIntProperty("itemTornadoID", Configuration.CATEGORY_ITEM, itemIndexID).getInt(itemIndexID++);
-            itemWormID = preInitConfig.getOrCreateIntProperty("itemWormID", Configuration.CATEGORY_ITEM, itemIndexID).getInt(itemIndexID++);
-            itemShockWaveID = preInitConfig.getOrCreateIntProperty("itemShockWaveID", Configuration.CATEGORY_ITEM, itemIndexID).getInt(itemIndexID++);
-            itemDrillID = preInitConfig.getOrCreateIntProperty("itemDrillID", Configuration.CATEGORY_ITEM, itemIndexID).getInt(itemIndexID++);
-            itemTestID = preInitConfig.getOrCreateIntProperty("itemTestID", Configuration.CATEGORY_ITEM, itemIndexID).getInt(itemIndexID++);
-            itemSurfboardID = preInitConfig.getOrCreateIntProperty("itemSurfboardID", Configuration.CATEGORY_ITEM, itemIndexID).getInt(itemIndexID++);
+            itemTornadoID = preInitConfig.get(Configuration.CATEGORY_ITEM, "itemTornadoID", itemIndexID).getInt(itemIndexID++);
+            itemWormID = preInitConfig.get(Configuration.CATEGORY_ITEM, "itemWormID", itemIndexID).getInt(itemIndexID++);
+            itemShockWaveID = preInitConfig.get(Configuration.CATEGORY_ITEM, "itemShockWaveID", itemIndexID).getInt(itemIndexID++);
+            itemDrillID = preInitConfig.get(Configuration.CATEGORY_ITEM, "itemDrillID", itemIndexID).getInt(itemIndexID++);
+            itemTestID = preInitConfig.get(Configuration.CATEGORY_ITEM, "itemTestID", itemIndexID).getInt(itemIndexID++);
+            itemSurfboardID = preInitConfig.get(Configuration.CATEGORY_ITEM, "itemSurfboardID", itemIndexID).getInt(itemIndexID++);
             
-            Storm_Tornado_maxBlocks = preInitConfig.getOrCreateIntProperty("Storm_Tornado_maxBlocks", Configuration.CATEGORY_GENERAL, 1200).getInt();
-            Storm_Tornado_maxParticles = preInitConfig.getOrCreateIntProperty("Storm_Tornado_maxParticles", Configuration.CATEGORY_GENERAL, 3000).getInt();
-            Storm_Tornado_height = preInitConfig.getOrCreateIntProperty("Storm_Tornado_height", Configuration.CATEGORY_GENERAL, 60).getInt();
-            //Storm_Tornado_maxYChange = preInitConfig.getOrCreateIntProperty("Storm_Tornado_maxYChange", Configuration.CATEGORY_GENERAL, 10).getInt(); //no longer a feature
-            Storm_Tornado_rarityOfFirenado = preInitConfig.getOrCreateIntProperty("Storm_Tornado_rarityOfFirenado", Configuration.CATEGORY_GENERAL, -1).getInt();
-            Storm_Tornado_rarityOfDisintegrate = preInitConfig.getOrCreateIntProperty("Storm_Tornado_rarityOfDisintegrate", Configuration.CATEGORY_GENERAL, 5).getInt();
-            Storm_Tornado_rarityOfBreakOnFall = preInitConfig.getOrCreateIntProperty("Storm_Tornado_rarityOfBreakOnFall", Configuration.CATEGORY_GENERAL, 5).getInt();
+            Storm_Tornado_maxBlocks = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Tornado_maxBlocks", 1200).getInt();
+            Storm_Tornado_maxParticles = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Tornado_maxParticles", 3000).getInt();
+            Storm_Tornado_height = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Tornado_height", 60).getInt();
+            //Storm_Tornado_maxYChange = preInitConfig.get("Storm_Tornado_maxYChange", Configuration.CATEGORY_GENERAL, 10).getInt(); //no longer a feature
+            Storm_Tornado_rarityOfFirenado = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Tornado_rarityOfFirenado", -1).getInt();
+            Storm_Tornado_rarityOfDisintegrate = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Tornado_rarityOfDisintegrate", 5).getInt();
+            Storm_Tornado_rarityOfBreakOnFall = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Tornado_rarityOfBreakOnFall", 5).getInt();
             
-            Storm_Tornado_grabPlayer = preInitConfig.getOrCreateBooleanProperty("Storm_Tornado_grabPlayer", Configuration.CATEGORY_GENERAL, true).getBoolean(true);
-            Storm_chanceOfTornado = (preInitConfig.getOrCreateIntProperty("Storm_chanceOfTornado", Configuration.CATEGORY_GENERAL, 3).getInt()) / 10F;
+            Storm_Tornado_grabPlayer = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Tornado_grabPlayer", true).getBoolean(true);
+            Storm_chanceOfTornado = (preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_chanceOfTornado", 3).getInt()) / 10F;
             
-            debug = preInitConfig.getOrCreateBooleanProperty("debug", Configuration.CATEGORY_GENERAL, false).getBoolean(false);
+            debug = preInitConfig.get(Configuration.CATEGORY_GENERAL, "debug", false).getBoolean(false);
             
-            Storm_rarityOfIncrease = preInitConfig.getOrCreateIntProperty("Storm_rarityOfIncrease", Configuration.CATEGORY_GENERAL, 4000).getInt();
+            Storm_rarityOfIncrease = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_rarityOfIncrease", 4000).getInt();
             
             
-            Wind_rarityOfIncrease = preInitConfig.getOrCreateIntProperty("Wind_rarityOfIncrease", Configuration.CATEGORY_GENERAL, 400).getInt();
+            Wind_rarityOfIncrease = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Wind_rarityOfIncrease", 400).getInt();
             
-            Wind_Particle_leafs = preInitConfig.getOrCreateBooleanProperty("Wind_Particle_leafs", Configuration.CATEGORY_GENERAL, true).getBoolean(true);
-            Wind_Particle_air = preInitConfig.getOrCreateBooleanProperty("Wind_Particle_air", Configuration.CATEGORY_GENERAL, true).getBoolean(true);
+            Wind_Particle_leafs = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Wind_Particle_leafs", true).getBoolean(true);
+            Wind_Particle_air = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Wind_Particle_air", true).getBoolean(true);
             //Wind_Particle_sand = preInitConfig.getOrCreateBooleanProperty("Wind_Particle_sand", Configuration.CATEGORY_GENERAL, true).getBoolean(true);
-            Storm_Tornado_oldParticles = preInitConfig.getOrCreateBooleanProperty("Storm_Tornado_oldParticles", Configuration.CATEGORY_GENERAL, false).getBoolean(false);
-            Storm_Tornado_makeClouds = preInitConfig.getOrCreateBooleanProperty("Storm_Tornado_makeClouds", Configuration.CATEGORY_GENERAL, true).getBoolean(true);
-            Storm_Lightning_active = preInitConfig.getOrCreateBooleanProperty("Storm_Lightning_active", Configuration.CATEGORY_GENERAL, true).getBoolean(true);
+            Storm_Tornado_oldParticles = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Tornado_oldParticles", false).getBoolean(false);
+            Storm_Tornado_makeClouds = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Tornado_makeClouds", true).getBoolean(true);
+            Storm_Lightning_active = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Lightning_active", true).getBoolean(true);
             
             
             
             if (c_CoroWeatherUtil.hasTropicraft()) {
-            	Storm_Tornado_maxActive = preInitConfig.getOrCreateIntProperty("Storm_Tornado_maxActive", Configuration.CATEGORY_GENERAL, 0).getInt();
-            	Wind_active = preInitConfig.getOrCreateBooleanProperty("Wind_active", Configuration.CATEGORY_GENERAL, false).getBoolean(false);
-            	waveRenderRange = preInitConfig.getOrCreateIntProperty("MainRealm_waveRenderRange", Configuration.CATEGORY_GENERAL, 0).getInt();
+            	Storm_Tornado_maxActive = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Tornado_maxActive", 0).getInt();
+            	Wind_active = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Wind_active", false).getBoolean(false);
+            	waveRenderRange = preInitConfig.get(Configuration.CATEGORY_GENERAL, "MainRealm_waveRenderRange", 0).getInt();
             	
-            	TropicraftRealm_Storm_Tornado_maxActive = preInitConfig.getOrCreateIntProperty("TropicraftRealm_Storm_Tornado_maxActive", Configuration.CATEGORY_GENERAL, 1).getInt();
-            	TropicraftRealm_Wind_active = preInitConfig.getOrCreateBooleanProperty("TropicraftRealm_Wind_active", Configuration.CATEGORY_GENERAL, true).getBoolean(true);
-            	TropicraftRealm_waveRenderRange = preInitConfig.getOrCreateIntProperty("TropicraftRealm_waveRenderRange", Configuration.CATEGORY_GENERAL, 50).getInt();
+            	TropicraftRealm_Storm_Tornado_maxActive = preInitConfig.get(Configuration.CATEGORY_GENERAL, "TropicraftRealm_Storm_Tornado_maxActive", 1).getInt();
+            	TropicraftRealm_Wind_active = preInitConfig.get(Configuration.CATEGORY_GENERAL, "TropicraftRealm_Wind_active", true).getBoolean(true);
+            	TropicraftRealm_waveRenderRange = preInitConfig.get(Configuration.CATEGORY_GENERAL, "TropicraftRealm_waveRenderRange", 50).getInt();
             	
-            	tornadoItems = preInitConfig.getOrCreateBooleanProperty("Tornado_Items", Configuration.CATEGORY_GENERAL, false).getBoolean(false);
+            	tornadoItems = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Tornado_Items", false).getBoolean(false);
             } else {
-            	Storm_Tornado_maxActive = preInitConfig.getOrCreateIntProperty("Storm_Tornado_maxActive", Configuration.CATEGORY_GENERAL, 1).getInt();
-            	Wind_active = preInitConfig.getOrCreateBooleanProperty("Wind_active", Configuration.CATEGORY_GENERAL, true).getBoolean(true);
-            	waveRenderRange = preInitConfig.getOrCreateIntProperty("waveRenderRange", Configuration.CATEGORY_GENERAL, 50).getInt();
+            	Storm_Tornado_maxActive = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Storm_Tornado_maxActive", 1).getInt();
+            	Wind_active = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Wind_active", true).getBoolean(true);
+            	waveRenderRange = preInitConfig.get(Configuration.CATEGORY_GENERAL, "waveRenderRange", 50).getInt();
             	
             	//shouldnt even be used if this is off
             	TropicraftRealm_Storm_Tornado_maxActive = 0;
             	TropicraftRealm_Wind_active = false;
             	TropicraftRealm_waveRenderRange = 50;
+            	
+            	tornadoItems = preInitConfig.get(Configuration.CATEGORY_GENERAL, "Tornado_Items", true).getBoolean(true);
             }
             
             backupWaveRenderRange = waveRenderRange;
@@ -1165,7 +1167,7 @@ public class WeatherMod implements Runnable
             pkt.data = bos.toByteArray();
             pkt.length = bos.size();
             //pkt.isChunkDataPacket = true;
-            MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(pkt);
+            MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayersInDimension(pkt, world.provider.dimensionId);
             
             world.weatherEffects.add(((Entity)ent));
         }
