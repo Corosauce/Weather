@@ -1,29 +1,19 @@
 package weather;
 
+import net.minecraft.command.ServerCommandManager;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 
 import weather.storm.StormManager;
 import weather.waves.CommandWaveHeight;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.src.ContainerPlayer;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.GuiScreen;
-import net.minecraft.src.InventoryPlayer;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.ServerCommandManager;
-import net.minecraft.src.Slot;
-import net.minecraft.src.World;
-import net.minecraft.src.c_CoroWeatherUtil;
-
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ITickHandler;
-import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
-import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.relauncher.Side;
 
 public class ServerTickHandler implements ITickHandler
 {
@@ -33,9 +23,12 @@ public class ServerTickHandler implements ITickHandler
     //public static HashMap<Integer, WeatherManager> wMans;
     //public static HashMap<Integer, StormManager> sMans;
     
+	//Used for easy iteration, could be replaced
     public static ArrayList<WeatherManager> wMans;
     public static ArrayList<StormManager> sMans;
     
+    //Main lookup method for dim to weather systems
+    public static HashMap<Integer, WeatherManager> dimToWeatherMan;
     public static HashMap<Integer, StormManager> dimToStormMan;
     
 	private World lastWorld;
@@ -44,16 +37,13 @@ public class ServerTickHandler implements ITickHandler
     	
     	wMans = new ArrayList();
     	sMans = new ArrayList();
-    	dimToStormMan = new HashMap();
+    	dimToStormMan = new HashMap<Integer, StormManager>();
+    	dimToWeatherMan = new HashMap<Integer, WeatherManager>();
     	
-    	wMans.add(new WeatherManager());
-    	sMans.add(new StormManager());
-    	dimToStormMan.put(0, sMans.get(0));
+    	addWorldToWeather(0);
     	
     	if (c_CoroWeatherUtil.hasTropicraft()) {
-    		wMans.add(new WeatherManager(c_CoroWeatherUtil.tropiDimID));
-        	sMans.add(new StormManager(c_CoroWeatherUtil.tropiDimID));
-        	dimToStormMan.put(c_CoroWeatherUtil.tropiDimID, sMans.get(1));
+    		addWorldToWeather(c_CoroWeatherUtil.tropiDimID);
     	}
     	
     	//sMans.g
@@ -99,10 +89,24 @@ public class ServerTickHandler implements ITickHandler
         if (world != null && lastWorld != world) {
         	lastWorld = world;
         	((ServerCommandManager)FMLCommonHandler.instance().getMinecraftServerInstance().getCommandManager()).registerCommand(new CommandWaveHeight());
+        	((ServerCommandManager)FMLCommonHandler.instance().getMinecraftServerInstance().getCommandManager()).registerCommand(new CommandWeather());
+        }
+        
+        if (WeatherMod.blockIDToUseMapping.size() == 0) WeatherMod.doBlockList();
+        
+        World worlds[] = DimensionManager.getWorlds();
+        
+        for (int i = 0; i < worlds.length; i++) {
+        	if (!dimToStormMan.containsKey(worlds[i].provider.dimensionId)) addWorldToWeather(worlds[i].provider.dimensionId);
+        	dimToStormMan.get(worlds[i].provider.dimensionId).tick(Side.SERVER, worlds[i]);
+        	WeatherMod.weather(Side.SERVER, worlds[i]);
+        	dimToWeatherMan.get(worlds[i].provider.dimensionId).tick(Side.SERVER, worlds[i]);
+        	//worlds[i]
+        	
         }
         
         //Called first
-        for (int i = 0; i < sMans.size(); i++) {
+        /*for (int i = 0; i < sMans.size(); i++) {
         	StormManager sMan = sMans.get(i);
         
         	World dimWorld = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(sMan.dimension);
@@ -121,8 +125,23 @@ public class ServerTickHandler implements ITickHandler
         		WeatherMod.weather(Side.SERVER, dimWorld); // hopefully this being called here should work ok for multidimensional handling
         		wMan.tick(Side.SERVER, dimWorld);
         	}
-        }
+        }*/
         
         
+    }
+    
+    public void addWorldToWeather(int dim) {
+    	dbg("Registering Weather & Storm Manager for dim: " + dim);
+    	WeatherManager wm = new WeatherManager(dim);
+    	StormManager sm = new StormManager(dim);
+    	
+    	wMans.add(wm);
+    	sMans.add(sm);
+    	dimToWeatherMan.put(dim, wm);
+    	dimToStormMan.put(dim, sm);
+    }
+    
+    public void dbg(Object obj) {
+    	System.out.println(obj);
     }
 }

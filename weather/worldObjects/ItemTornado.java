@@ -3,23 +3,23 @@ package weather.worldObjects;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 
+import net.minecraft.client.renderer.culling.Frustrum;
+import net.minecraft.client.settings.EnumOptions;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagByte;
+import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Icon;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
 import weather.WeatherEntityConfig;
 import weather.WeatherMod;
 import weather.blocks.structure.Structure;
 import weather.storm.EntTornado;
-
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EnumOptions;
-import net.minecraft.src.Frustrum;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.NBTTagByte;
-import net.minecraft.src.Packet250CustomPayload;
-import net.minecraft.src.World;
 
 public class ItemTornado extends Item
 {
@@ -31,6 +31,10 @@ public class ItemTornado extends Item
         this.maxStackSize = 64;
         this.type = var2;
         this.setMaxDamage(190);
+    }
+    
+    public Icon getIconFromDamage(int par1) {
+    	return Item.silk.getIconFromDamage(0);
     }
 
     public ItemStack onItemRightClick(ItemStack var1, World var2, EntityPlayer var3)
@@ -67,6 +71,15 @@ public class ItemTornado extends Item
         {
         	var4 = new Structure(var2);
             ((Structure)var4).setPosition(var3.posX, var3.posY + 5, var3.posZ);
+            
+            //Zombie zombie = new Zombie(var2);
+			
+			//zombie.setPosition(var3.posX, var3.posY + 5, var3.posZ);
+			
+			var2.spawnEntityInWorld((Structure)var4);
+			
+			return var1;
+            
             //((c_w_EntWorm)var4).head.bodyPiece.setPosition(var3.posX, var3.posY + 3, var3.posZ);
         }
 

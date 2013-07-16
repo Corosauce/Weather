@@ -1,17 +1,17 @@
 package weather.worldObjects;
 
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+
 import java.util.List;
 
 import weather.WeatherMod;
 import weather.blocks.MovingBlock;
-
-import net.minecraft.src.AxisAlignedBB;
-import net.minecraft.src.Block;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.World;
 
 public class EntDrill extends Entity
 {
@@ -55,7 +55,7 @@ public class EntDrill extends Entity
 
         if (var5 != 0 && this.worldObj.getBlockTileEntity(var1, var2, var3) == null)
         {
-            this.worldObj.setBlockWithNotify(var1, var2, var3, 0);
+            this.worldObj.setBlock(var1, var2, var3, 0, 0, 2);
 
             if (var5 != Block.snow.blockID)
             {

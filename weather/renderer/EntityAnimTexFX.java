@@ -1,12 +1,16 @@
 package weather.renderer;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.src.ModLoader;
+import net.minecraft.world.World;
+
 import java.awt.Color;
 
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.Tessellator;
-import net.minecraft.src.World;
-import cpw.mods.fml.common.asm.SideOnly;
-import cpw.mods.fml.common.Side;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import extendedrenderer.particle.entity.EntityRotFX;
 @SideOnly(Side.CLIENT)
 public class EntityAnimTexFX extends EntityRotFX
 {
@@ -23,12 +27,15 @@ public class EntityAnimTexFX extends EntityRotFX
     //or not
     public int type = 0;
     public int frames = 10;
+    public int frame = 0;
 
     public EntityAnimTexFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12, double var14, int texIDs[], int var16)
     {
         this(var1, var2, var4, var6, var8, var10, var12, var14, texIDs);
         Color var17 = null;
 
+        frame = var1.rand.nextInt(frames);
+        
         if (var16 == 0)
         {
             this.particleRed = this.particleGreen = this.particleBlue = this.rand.nextFloat() * 0.3F;
@@ -123,7 +130,11 @@ public class EntityAnimTexFX extends EntityRotFX
             //System.out.println((int)posX + " - " + (int)posZ);
         }
 
-        this.setParticleTextureIndex((((int)particleAge / 3) + 0) % (frames));
+        if (type != 1) {
+        	this.setParticleTextureIndex((((int)particleAge / 3) + 0) % (frames));
+        } else {
+        	this.setParticleTextureIndex(frame);
+        }
         int xCount = 2;
         int yCount = 4;
         float resSizeScaled = 0.0624375F * 4F;
@@ -162,8 +173,27 @@ public class EntityAnimTexFX extends EntityRotFX
         //var15 += k;
         //System.out.println("!!!");
         float var16 = /*this.getEntityBrightness(var2) * */brightness;
-        var16 = (1F + ModLoader.getMinecraftInstance().gameSettings.gammaSetting) - (this.worldObj.calculateSkylightSubtracted(var2) * 0.13F);
-        var1.setColorOpaque_F(this.particleRed * var16, this.particleGreen * var16, this.particleBlue * var16);
+        //var16 = (Minecraft.getMinecraft().gameSettings.gammaSetting) - (this.worldObj.calculateSkylightSubtracted(var2) * 0.F);
+        float adjSubtracted = (this.worldObj.calculateSkylightSubtracted(var2) / 15F) * 0.5F;
+        var16 = 0.4F - adjSubtracted + (ModLoader.getMinecraftInstance().gameSettings.gammaSetting * 0.7F);
+        
+        //var16 -= 0.5F;
+        //var16 += 0.3F;
+        
+        //var16 = 2F;
+        
+        //var1.setColorOpaque_F(this.particleRed * var16, this.particleGreen * var16, this.particleBlue * var16);
+        
+        float gamma = 0.7F;
+        
+        if (particleMaxAge - particleAge < 70) {
+        	int count = (particleMaxAge - particleAge);
+        	gamma = (float)count * 0.01F;
+        	//gamma += ((float)Math.abs(particleMaxAge - particleAge) * 0.02F);
+        	//System.out.println("gamma: " + gamma);
+        }
+        
+        var1.setColorRGBA_F(this.particleRed * var16, this.particleGreen * var16, this.particleBlue * var16, Math.max(0F, gamma));
         var1.addVertexWithUV((double)(var13 - var3 * var12 - var6 * var12), (double)(var14 - var4 * var12), (double)(var15 - var5 * var12 - var7 * var12 - 0F), (double)var9, (double)var11);
         var1.addVertexWithUV((double)(var13 - var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 - var5 * var12 + var7 * var12 - 0F), (double)var9, (double)var10);
         var1.addVertexWithUV((double)(var13 + var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 + var5 * var12 + var7 * var12 + 0F), (double)var8, (double)var10);
@@ -225,5 +255,9 @@ public class EntityAnimTexFX extends EntityRotFX
     public int getFXLayer()
     {
         return 4;
+    }
+    
+    public float maxRenderRange() {
+    	return 512F;
     }
 }

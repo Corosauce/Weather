@@ -1,17 +1,17 @@
 package weather.blocks;
 
-import java.util.Random;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.Material;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 
-import net.minecraft.src.BlockContainer;
-import net.minecraft.src.Material;
-import net.minecraft.src.TileEntity;
-import net.minecraft.src.World;
+import java.util.Random;
 
 public class BlockTSiren extends BlockContainer
 {
-    public BlockTSiren(int var1, int var2)
+    public BlockTSiren(int var1)
     {
-        super(var1, var2, Material.clay);
+        super(var1, Material.clay);
     }
 
     public int tickRate()

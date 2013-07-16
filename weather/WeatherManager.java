@@ -1,22 +1,31 @@
 package weather;
 
+import net.minecraft.block.material.MaterialLiquid;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityBoat;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityFishHook;
+import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.SpawnerAnimals;
+import net.minecraft.world.World;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import weather.config.ConfigWavesMisc;
+import weather.config.ConfigWind;
 import weather.waves.BlockDataGrid;
 import weather.waves.BlockDataPoint;
 import weather.waves.EntityBuoyant;
 import weather.waves.EntitySurfboard;
-
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.server.FMLServerHandler;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.*;
+import CoroAI.entity.EntityTropicalFishHook;
+import cpw.mods.fml.relauncher.Side;
 
 public class WeatherManager
 {
@@ -160,6 +169,37 @@ public class WeatherManager
             //if(list != null) {
             //for(int i = 0; i < list.size(); i++) {
             //Entity entity1 = (Entity)list.get(i);
+            
+            if (entity1.worldObj.isRemote && entity1 instanceof EntityPlayer && entity1.onGround) {
+            	int oceanLevel = 63;
+            	int xx = (int)Math.floor(entity1.posX);
+                int zz = (int)Math.floor(entity1.posZ);
+                BlockDataPoint bdp = waterGrid.getPoint(xx, oceanLevel - 1, zz, true);
+            	if (!bdp.isWater) {
+            		
+            		int radius = 2;
+            		BlockDataPoint bdp2;
+            		for (int xxx = xx-radius; xxx < xx+radius; xxx++) {
+            			for (int zzz = zz-radius; zzz < zz+radius; zzz++) {
+            				bdp2 = waterGrid.getPoint(xxx, oceanLevel - 1, zzz);
+                    		if (!bdp2.isWater) {
+                    			//System.out.println("fix wave heights! - " + xxx + ", " + oceanLevel + ", " + zzz);
+                    			bdp2.updateCache();
+                    		}
+            			}
+            		}
+            		
+            		
+            		/*bdp2 = waterGrid.getPoint(xx+1, oceanLevel - 1, zz);
+            		if (!bdp.isWater) bdp2.updateCache();
+            		bdp2 = waterGrid.getPoint(xx, oceanLevel - 1, zz-1);
+            		if (!bdp.isWater) bdp2.updateCache();
+            		bdp2 = waterGrid.getPoint(xx, oceanLevel - 1, zz+1);
+            		if (!bdp.isWater) bdp2.updateCache();*/
+    	        	
+            	}
+            }
+            
 
             if (isBoyant(entity1))
             {
@@ -190,7 +230,7 @@ public class WeatherManager
             }
         }
 
-        if (ent instanceof EntityItem || ent instanceof EntityBoat || ent instanceof EntityBuoyant)
+        if (ent instanceof EntityItem || ent instanceof EntityBoat || ent instanceof EntityBuoyant/* || ent instanceof EntityTropicalFishHook || ent instanceof EntityFishHook*/)
         {
             return true;
         }
@@ -208,11 +248,15 @@ public class WeatherManager
         int oceanLevel = 63;
         int xx = (int)(ent.posX + 0.5F);
         int zz = (int)(ent.posZ + 0.5F);
-        xx = (int)Math.floor(ent.posX + 0.5F);
-        zz = (int)Math.floor(ent.posZ + 0.5F);
+        xx = (int)Math.floor(ent.posX);
+        zz = (int)Math.floor(ent.posZ);
         int yy = (int)Math.floor(ent.posY + 0.5F);
         //int yy = ent.worldObj.getHeightValue(xx, zz)-1;
-        BlockDataPoint bdp = waterGrid.getPoint(xx, oceanLevel - 1, zz);
+        BlockDataPoint bdp;// = waterGrid.getPoint(xx, oceanLevel - 1, zz);
+        
+        
+        bdp = waterGrid.getPoint(xx, oceanLevel - 1, zz);
+        //}
 
         if (!(ent.worldObj.isRemote))
         {
@@ -226,8 +270,14 @@ public class WeatherManager
         {
             adj = 0F;
         }
+        
+        float offsetFix = 0F;
+        
+        if (ent instanceof EntityFishHook) {
+        	offsetFix = 0.5F;
+        }
 
-        if (ent.posY < (oceanLevel - 0.5F)/* && ent.posY > (oceanLevel - 1 + bdp.height)*/)
+        if ((ent.posY + ent.getEyeHeight() + offsetFix) < (oceanLevel - 0.5F) && !(ent.worldObj.getBlockMaterial((int)ent.posX, (int)ent.posY, (int)ent.posZ) instanceof MaterialLiquid)/* && ent.posY > (oceanLevel - 1 + bdp.height)*/)
         {
             //if (ent instanceof EntityPlayer)
             //{
@@ -249,14 +299,14 @@ public class WeatherManager
             }
 
             float top = oceanLevel + (bdp.height);
-            float diff = top - ((float)ent.posY - adj);
+            float diff = top - ((float)(ent.posY + ent.getEyeHeight() + offsetFix) - adj);
 
             if ((ent instanceof EntityBuoyant && !(ent.worldObj.isRemote)))
             {
                 int uhm = 0;
             }
 
-            if (ent.posY - 1.0F <= top)
+            if ((ent.posY + ent.getEyeHeight() + offsetFix) - 1.0F <= top)
             {
                 if (!ent.isInWater())
                 {
@@ -279,6 +329,16 @@ public class WeatherManager
 
                 if (diff > 0F)
                 {
+                	
+                	if (ent instanceof EntityLiving)
+                    {
+                		ySpeed *= 1.25F;
+                    } else if (ent instanceof EntityFishHook) {
+                    	ySpeed *= 0.0F; //fix for vanilla fishing mechanic, stuttery movement as well
+                    } else if (ent instanceof EntityBuoyant) {
+                    	ySpeed *= 2F;
+                    }
+                	
                     if (ent instanceof EntitySurfboard)
                     {
                         int herp = 34;
@@ -379,7 +439,7 @@ public class WeatherManager
         //ACTIVATE SEPARATE STAGE MANAGEMENT ONCE READY!
         boolean remote = world.isRemote;
 
-        boolean windOn = ((WeatherMod.Wind_active && world.provider.dimensionId == c_CoroWeatherUtil.mainDimID) || (WeatherMod.TropicraftRealm_Wind_active && world.provider.dimensionId == c_CoroWeatherUtil.tropiDimID));
+        boolean windOn = ((ConfigWind.Wind_active && world.provider.dimensionId == c_CoroWeatherUtil.mainDimID) || (ConfigWind.TropicraftRealm_Wind_active && world.provider.dimensionId == c_CoroWeatherUtil.tropiDimID));
         
         if (side == Side.SERVER)
         {
@@ -391,9 +451,11 @@ public class WeatherManager
         {
         }
 
+        //windEventTime = 5000;
+        
         //
         //stage = mod_EntMover.stage;
-        if (WeatherMod.waveRenderRange > 0) updateWater(world);
+        if (ConfigWavesMisc.waveRenderRange > 0) updateWater(world);
 
         if (side == Side.SERVER)
         {
@@ -413,7 +475,12 @@ public class WeatherManager
                 windGustEventTime--;
             }
 
-            //wind.windStrength = 0.2F;
+            
+            //temp debug force wind always
+            //wind.strength = 0.9F;
+            
+            //System.out.println("AABB pool size: " + AxisAlignedBB.getAABBPool().getlistAABBsize());
+            
             wind.yDirection = 0.0F;
             wind.yStrength = 0.0F;
             //chance of wind, once in a while (5 seconds) roll dice and see if wind should fade into range or fade to none
@@ -632,7 +699,7 @@ public class WeatherManager
 
     public void manageStage()
     {
-        rarityOfStormIncrease = WeatherMod.Wind_rarityOfIncrease;
+        rarityOfStormIncrease = ConfigWind.Wind_rarityOfIncrease;
 
         //TEMP!
         //rarityOfStormIncrease = 20;

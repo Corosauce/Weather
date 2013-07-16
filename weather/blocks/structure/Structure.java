@@ -1,28 +1,19 @@
 package weather.blocks.structure;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.lang.reflect.Field;
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 
-import org.lwjgl.opengl.GL11;
+import java.util.LinkedList;
+import java.util.List;
 
 import weather.WeatherMod;
-
 import CoroAI.PathEntityEx;
-import CoroAI.c_IEnhAI;
 import CoroAI.entity.EnumActState;
 import CoroAI.entity.EnumJob;
 import CoroAI.entity.JobManager;
-
-import cpw.mods.fml.client.FMLClientHandler;
-
-import net.minecraft.src.Block;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.Vec3;
-import net.minecraft.src.World;
 
 public class Structure extends EntityLiving
 {
@@ -273,7 +264,7 @@ public class Structure extends EntityLiving
             return false;
         }
 
-        world.setBlockWithNotify(tryX,tryY,tryZ, 0);
+        world.setBlock(tryX,tryY,tryZ, 0, 0, 2);
         PhantomBlock mBlock;
 
         if (blockID == Block.grass.blockID) {
@@ -315,7 +306,7 @@ public class Structure extends EntityLiving
 	        	
 	        	int id = worldObj.getBlockId(xx, yy, zz);
 	        	
-	        	worldObj.setBlock(xx, yy, zz, 0);
+	        	worldObj.setBlock(xx, yy, zz, 0, 0, 2);
 	        	
         	}
 		}

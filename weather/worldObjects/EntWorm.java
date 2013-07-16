@@ -1,10 +1,11 @@
 package weather.worldObjects;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+
 import weather.blocks.MovingBlock;
-import net.minecraft.src.Entity;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.World;
 
 public class EntWorm extends Entity
 {
@@ -86,7 +87,7 @@ public class EntWorm extends Entity
 
     public MovingBlock newBlock(int var1, int var2, int var3)
     {
-        this.worldObj.setBlockWithNotify(var1, var2, var3, 0);
+        this.worldObj.setBlock(var1, var2, var3, 0, 0, 2);
         MovingBlock var4 = new MovingBlock(this.worldObj, var1, var2, var3, 51);
         this.worldObj.spawnEntityInWorld(var4);
         return var4;

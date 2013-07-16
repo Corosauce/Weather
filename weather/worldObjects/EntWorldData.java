@@ -1,12 +1,11 @@
 package weather.worldObjects;
 
-import weather.WeatherMod;
-import net.minecraft.src.Entity;
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.src.ModLoader;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.World;
-import cpw.mods.fml.common.asm.SideOnly;
-import cpw.mods.fml.common.Side;
+import net.minecraft.world.World;
+
+import weather.WeatherMod;
 //@SideOnly(Side.CLIENT)
 public class EntWorldData extends Entity
 {

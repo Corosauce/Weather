@@ -1,17 +1,15 @@
 package weather.blocks;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.Block;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityRenderer;
-import net.minecraft.src.FontRenderer;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.Render;
-import net.minecraft.src.RenderBlocks;
-import net.minecraft.src.Tessellator;
-import net.minecraft.src.World;
-import net.tropicraft.entities.EntityKoaManly;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
 
@@ -89,11 +87,11 @@ public class MovingBlockRenderer extends Render
         }
         
         //NEW! - set block render size
-        a.func_83020_a(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
-        //a.func_83020_a(0.25D, 0.25D, 0.25D, 0.75D, 0.75D, 0.75D);
+        a.setRenderBounds(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
+        //a.setRenderMinMax(0.25D, 0.25D, 0.25D, 0.75D, 0.75D, 0.75D);
 
         var12.setColorOpaque_F(var15 * var8 * var14, var16 * var8 * var14, var17 * var8 * var14);
-        this.a.renderBottomFace(var2, -0.5D, -0.5D, -0.5D, var2.getBlockTextureFromSideAndMetadata(0, var7));
+        this.a.renderFaceYNeg(var2, -0.5D, -0.5D, -0.5D, var2.getIcon(0, var7));
 
         if (var14 < var13)
         {
@@ -101,7 +99,7 @@ public class MovingBlockRenderer extends Render
         }
 
         var12.setColorOpaque_F(var15 * var9 * var14, var16 * var9 * var14, var17 * var9 * var14);
-        this.a.renderTopFace(var2, -0.5D, -0.5D, -0.5D, var2.getBlockTextureFromSideAndMetadata(1, var7));
+        this.a.renderFaceYPos(var2, -0.5D, -0.5D, -0.5D, var2.getIcon(1, var7));
 
         if (var14 < var13)
         {
@@ -109,7 +107,7 @@ public class MovingBlockRenderer extends Render
         }
 
         var12.setColorOpaque_F(var15 * var10 * var14, var16 * var10 * var14, var17 * var10 * var14);
-        this.a.renderEastFace(var2, -0.5D, -0.5D, -0.5D, var2.getBlockTextureFromSideAndMetadata(2, var7));
+        this.a.renderFaceZNeg(var2, -0.5D, -0.5D, -0.5D, var2.getIcon(2, var7));
 
         if (var14 < var13)
         {
@@ -117,7 +115,7 @@ public class MovingBlockRenderer extends Render
         }
 
         var12.setColorOpaque_F(var15 * var10 * var14, var16 * var10 * var14, var17 * var10 * var14);
-        this.a.renderWestFace(var2, -0.5D, -0.5D, -0.5D, var2.getBlockTextureFromSideAndMetadata(3, var7));
+        this.a.renderFaceZPos(var2, -0.5D, -0.5D, -0.5D, var2.getIcon(3, var7));
 
         if (var14 < var13)
         {
@@ -125,7 +123,7 @@ public class MovingBlockRenderer extends Render
         }
 
         var12.setColorOpaque_F(var15 * var11 * var14, var16 * var11 * var14, var17 * var11 * var14);
-        this.a.renderNorthFace(var2, -0.5D, -0.5D, -0.5D, var2.getBlockTextureFromSideAndMetadata(4, var7));
+        this.a.renderFaceXNeg(var2, -0.5D, -0.5D, -0.5D, var2.getIcon(4, var7));
 
         if (var14 < var13)
         {
@@ -133,7 +131,7 @@ public class MovingBlockRenderer extends Render
         }
 
         var12.setColorOpaque_F(var15 * var11 * var14, var16 * var11 * var14, var17 * var11 * var14);
-        this.a.renderSouthFace(var2, -0.5D, -0.5D, -0.5D, var2.getBlockTextureFromSideAndMetadata(5, var7));
+        this.a.renderFaceXPos(var2, -0.5D, -0.5D, -0.5D, var2.getIcon(5, var7));
         var12.draw();
     }
 

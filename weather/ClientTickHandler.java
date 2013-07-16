@@ -1,30 +1,22 @@
 package weather;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.world.World;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.EnumSet;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
+import weather.config.ConfigWavesMisc;
 import weather.worldObjects.GuiWeatherCP;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.src.ContainerPlayer;
-import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.GuiIngame;
-import net.minecraft.src.GuiScreen;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.Slot;
-import net.minecraft.src.Tessellator;
-import net.minecraft.src.World;
-import net.minecraft.src.c_CoroWeatherUtil;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.ITickHandler;
-import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.relauncher.Side;
 
 public class ClientTickHandler implements ITickHandler
 {
@@ -71,7 +63,7 @@ public class ClientTickHandler implements ITickHandler
     {
     	Minecraft mc = FMLClientHandler.instance().getClient();
     	
-    	if (WeatherMod.debug && WeatherMod.showWeatherInfo && mc != null && mc.thePlayer != null)
+    	if (ConfigWavesMisc.debug && WeatherMod.showWeatherInfo && mc != null && mc.thePlayer != null)
         {
     		WeatherMod.proxy.weatherDbg();
     		WeatherMod.proxy.windDbg();
@@ -135,8 +127,8 @@ public class ClientTickHandler implements ITickHandler
         	exxx.printStackTrace();
         }*/
     	
-    	Minecraft mc = FMLClientHandler.instance().getClient();
-        World world = mc.theWorld;
+    	WeatherMod.instance.mc = FMLClientHandler.instance().getClient();
+        World world = WeatherMod.instance.mc.theWorld;
 
         if (world != null && !FMLClientHandler.instance().getClient().isGamePaused)
         {
@@ -145,8 +137,8 @@ public class ClientTickHandler implements ITickHandler
             WeatherMod.stormMan.tick(Side.CLIENT, world);
         }
         
-        if (WeatherMod.debug && Keyboard.isKeyDown(WeatherMod.weatherInfoKey) && !(mc.currentScreen instanceof GuiWeatherCP)) {
-    		mc.displayGuiScreen(new GuiWeatherCP());
+        if (ConfigWavesMisc.debug && Keyboard.isKeyDown(WeatherMod.weatherInfoKey) && !(WeatherMod.instance.mc.currentScreen instanceof GuiWeatherCP)) {
+        	WeatherMod.instance.mc.displayGuiScreen(new GuiWeatherCP());
     		//showWeatherInfo = false;
     	}
     }

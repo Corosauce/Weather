@@ -1,8 +1,8 @@
 package weather.storm;
 
-import net.minecraft.src.Entity;
-import net.minecraft.src.Render;
-import net.minecraft.src.Tessellator;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.entity.Entity;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;

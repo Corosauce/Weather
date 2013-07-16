@@ -1,14 +1,29 @@
-package net.minecraft.src;
+package weather;
 
 import java.lang.reflect.Field;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.passive.EntityWaterMob;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.src.ModLoader;
+import net.minecraft.util.Icon;
+import net.minecraft.world.World;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.asm.SideOnly;
+import CoroAI.c_CoroAIUtil;
+import CoroAI.entity.EntityTropicalFishHook;
+
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class c_CoroWeatherUtil
 {
@@ -18,9 +33,12 @@ public class c_CoroWeatherUtil
     
     //Tropicraft reflection
     public static boolean hasTropicraft = true; //try reflection once
-	public static String tcE = "net.tropicraft.entities.";
-	public static String[] noFloatEnts_tropical = {"EntityTropicalFish", "EntityTropicraftWaterMob", "EntityAmphibian"};
-	public static String[] noWindEnts_tropical = {"EntityTropicalFish", "EntityTropicraftWaterMob", "EntityAmphibian"};
+    public static boolean genCache = true;
+	public static String tcE = "tropicraft.entities.";
+	public static String[] noFloatEnts_tropical = {"passive.water.EntityTropicalFish", "EntityTropicraftWaterMob", "passive.water.EntityAmphibian", "passive.water.EntityManOWar", "passive.water.EntityMarlin", "hostile.land.TreeFrog"};
+	public static String[] noWindEnts_tropical = {"passive.water.EntityTropicalFish", "EntityTropicraftWaterMob", "passive.water.EntityAmphibian", "passive.water.EntityManOWar", "passive.water.EntityMarlin"};
+	public static Class[] noFloatEnts_tropical_class;
+	public static Class[] noWindEnts_tropical_class;
 	public static int tropiDimID = -127;
 	public static int mainDimID = 0;
 
@@ -32,7 +50,7 @@ public class c_CoroWeatherUtil
     	try {
     		if (hasTropicraft) {
     			
-    			Class clazz = Class.forName("net.tropicraft.mods.TropicraftMod");
+    			Class clazz = Class.forName("tropicraft.Tropicraft");
     			
     			if (clazz != null) {
     				return true;
@@ -47,10 +65,15 @@ public class c_CoroWeatherUtil
     }
     
     public static boolean canUseWavesOn(Entity ent) {
+    	if (ent instanceof EntityTropicalFishHook) {
+    		return false;
+    	}
     	if (!hasTropicraft) return false;
+    	if (genCache) genCache();
+    	
     	try {
-    		for (String entStr : noFloatEnts_tropical) {
-    			if (Class.forName(tcE + entStr).isInstance(ent)) {
+    		for (Class cl : noFloatEnts_tropical_class) {
+    			if (cl.isInstance(ent)) {
     				return false;
     			}
     		}
@@ -63,9 +86,10 @@ public class c_CoroWeatherUtil
     
     public static boolean canUseWindOn(Entity ent) {
     	if (!hasTropicraft) return false;
+    	if (genCache) genCache();
     	try {
-    		for (String entStr : noWindEnts_tropical) {
-    			if (Class.forName(tcE + entStr).isInstance(ent)) {
+    		for (Class cl : noWindEnts_tropical_class) {
+    			if (cl.isInstance(ent)) {
     				return false;
     			}
     		}
@@ -74,6 +98,42 @@ public class c_CoroWeatherUtil
     		ex.printStackTrace();
     	}
     	return true;
+    }
+    
+    public static void genCache() {
+    	genCache = false;
+    	
+    	noFloatEnts_tropical_class = new Class[noFloatEnts_tropical.length];
+    	noWindEnts_tropical_class = new Class[noWindEnts_tropical.length];
+    	
+    	try {
+    		int i = 0;
+	    	for (String entStr : noFloatEnts_tropical) {
+	    		
+	    		Class clazz = Class.forName(tcE + entStr);
+				if (clazz != null) {
+					noFloatEnts_tropical_class[i] = clazz;
+				} else {
+					System.out.println("CRITICAL CLASS CACHING FAIL, CHECK TROPICRAFT CLASS NAMES! OR TELL CORO!");
+				}
+				i++;
+			}
+	    	i = 0;
+	    	for (String entStr : noWindEnts_tropical) {
+	    		
+	    		Class clazz = Class.forName(tcE + entStr);
+				if (clazz != null) {
+					noWindEnts_tropical_class[i] = clazz;
+				} else {
+					System.out.println("CRITICAL CLASS CACHING FAIL, CHECK TROPICRAFT CLASS NAMES! OR TELL CORO!");
+				}
+				i++;
+			}
+	    } catch (Exception ex) {
+			hasTropicraft = false;
+			System.out.println("CRITICAL CLASS CACHING FAIL, CHECK TROPICRAFT CLASS NAMES! OR TELL CORO!");
+			ex.printStackTrace();
+		}
     }
 
     public static int getParticleAge(EntityFX ent)
@@ -114,6 +174,10 @@ public class c_CoroWeatherUtil
     public static void setParticleScale(EntityFX ent, float val)
     {
         ent.particleScale = val;
+    }
+    
+    public static Icon particleTextureIndex(EntityFX ent) {
+    	return ent.particleIcon;
     }
 
     public static float getThunderStr(World world)
@@ -172,10 +236,15 @@ public class c_CoroWeatherUtil
     @SideOnly(Side.CLIENT)
     public static boolean hmm()
     {
-        if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.keyCode))
-        {
-            return true;
-        }
+    	try {
+	        if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.keyCode))
+	        {
+	            return true;
+	        }
+    	} catch (Exception ex) {
+    		//nope
+    		return false;
+    	}
 
         return false;
     }
@@ -207,42 +276,12 @@ public class c_CoroWeatherUtil
 
     public static void setPrivateValueBoth(Class var0, Object var1, String obf, String mcp, Object var3)
     {
-        try
-        {
-            try
-            {
-                setPrivateValue(var0, var1, obf, var3);
-            }
-            catch (Exception ex)
-            {
-                setPrivateValue(var0, var1, mcp, var3);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+    	c_CoroAIUtil.setPrivateValueBoth(var0, var1, obf, mcp, var3);
     }
 
     public static Object getPrivateValueBoth(Class var0, Object var1, String obf, String mcp)
     {
-        try
-        {
-            try
-            {
-                return getPrivateValue(var0, var1, obf);
-            }
-            catch (Exception ex)
-            {
-                return getPrivateValue(var0, var1, mcp);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-
-        return null;
+        return c_CoroAIUtil.getPrivateValueBoth(var0, var1, obf, mcp);
     }
 
     public static Object getPrivateValue(Class var0, Object var1, String var2) throws IllegalArgumentException, SecurityException, NoSuchFieldException

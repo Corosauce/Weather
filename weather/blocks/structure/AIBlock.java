@@ -3,53 +3,16 @@ package weather.blocks.structure;
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import net.minecraft.client.Minecraft;
-import net.minecraft.src.BaseMod;
-import net.minecraft.src.Block;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.GuiChat;
-import net.minecraft.src.GuiContainer;
-import net.minecraft.src.GuiScreen;
-import net.minecraft.src.IBlockAccess;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.MLProp;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.SoundPool;
-import net.minecraft.src.Vec3;
-import net.minecraft.src.World;
-import paulscode.sound.SoundSystem;
-import java.util.Random;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-
-import java.util.Map;
-import org.lwjgl.input.Keyboard;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.Mod.Init;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.asm.SideOnly;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
-import cpw.mods.fml.common.registry.EntityRegistry;
-import cpw.mods.fml.common.registry.TickRegistry;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid = "AIBlock", name = "AIBlock", version = "v1.0")
 @NetworkMod(clientSideRequired = true, serverSideRequired = true)
@@ -109,7 +72,7 @@ public class AIBlock {
             return false;
         }
 
-        world.setBlockWithNotify(tryX,tryY,tryZ, 0);
+        world.setBlock(tryX,tryY,tryZ, 0, 0, 2);
         PhantomBlock mBlock;
 
         if (blockID == Block.grass.blockID) {

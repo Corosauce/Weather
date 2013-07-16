@@ -1,6 +1,5 @@
 package weather;
 
-import net.minecraft.src.*;
 
 public class Wind
 {

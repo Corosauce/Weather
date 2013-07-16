@@ -1,14 +1,15 @@
 package weather.storm;
 
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.src.ModLoader;
+import net.minecraft.world.World;
+
 import java.awt.Color;
 
-import weather.renderer.EntityRotFX;
 
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.Tessellator;
-import net.minecraft.src.World;
-import cpw.mods.fml.common.asm.SideOnly;
-import cpw.mods.fml.common.Side;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import extendedrenderer.particle.entity.EntityRotFX;
 @SideOnly(Side.CLIENT)
 public class EntityWindFX extends EntityRotFX
 {
@@ -57,32 +58,34 @@ public class EntityWindFX extends EntityRotFX
             this.particleBlue = (float)var17.getBlue() / 255.0F;
         }
 
-        this.particleScale = this.rand.nextFloat() * this.rand.nextFloat() * 6.0F + 1.0F;
+        this.particleScale = this.rand.nextFloat() * this.rand.nextFloat() * 6.0F + 6.0F;
         this.particleMaxAge = 18;
         this.particleMaxAge = (int)((double)((float)this.particleMaxAge) * var14);
         this.particleGravity = 0.1F;
-        this.particleScale = 5.0F;
+        //this.particleScale = 5.0F;
     }
 
-    public void renderParticle(Tessellator var1, float var2, float var3, float var4, float var5, float var6, float var7)
+    public void renderParticle(Tessellator par1Tessellator, float par2, float par3, float par4, float par5, float par6, float par7)
     {
-        float var8 = (float)(this.getParticleTextureIndex() % 16) / 16.0F;
-        float var9 = var8 + 0.0624375F;
-        float var10 = (float)(this.getParticleTextureIndex() / 16) / 16.0F;
-        float var11 = var10 + 0.0624375F;
-        float var12 = 0.1F * this.particleScale;
-        float var13 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)var2 - interpPosX);
-        float var14 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)var2 - interpPosY);
-        float var15 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)var2 - interpPosZ);
-        float var16 = this.getBrightness(var2) * this.brightness;
-        var16 = (1F + ModLoader.getMinecraftInstance().gameSettings.gammaSetting) - (this.worldObj.calculateSkylightSubtracted(var2) * 0.13F);
-        var1.setColorOpaque_F(this.particleRed * var16, this.particleGreen * var16, this.particleBlue * var16);
-        var1.addVertexWithUV((double)(var13 - var3 * var12 - var6 * var12), (double)(var14 - var4 * var12), (double)(var15 - var5 * var12 - var7 * var12), (double)var9, (double)var11);
-        var1.addVertexWithUV((double)(var13 - var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 - var5 * var12 + var7 * var12), (double)var9, (double)var10);
-        var1.addVertexWithUV((double)(var13 + var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 + var5 * var12 + var7 * var12), (double)var8, (double)var10);
-        var1.addVertexWithUV((double)(var13 + var3 * var12 - var6 * var12), (double)(var14 - var4 * var12), (double)(var15 + var5 * var12 - var7 * var12), (double)var8, (double)var11);
+        float f6 = ((float)this.particleAge + par2) / (float)this.particleMaxAge * 32.0F;
+
+        if (f6 < 0.0F)
+        {
+            f6 = 0.0F;
+        }
+
+        if (f6 > 1.0F)
+        {
+            f6 = 1.0F;
+        }
+
+        //this.particleScale = f6;
+        super.renderParticle(par1Tessellator, par2, par3, par4, par5, par6, par7);
     }
 
+    /**
+     * Called to update the entity's position/logic.
+     */
     public void onUpdate()
     {
         this.prevPosX = this.posX;
@@ -95,12 +98,28 @@ public class EntityWindFX extends EntityRotFX
         }
 
         this.setParticleTextureIndex(7 - this.particleAge * 8 / this.particleMaxAge);
-        this.setParticleTextureIndex(7 - this.particleAge * 8 / this.particleMaxAge);
-        this.motionY -= 0.05000000074505806D;
-        float var1 = 0.98F;
-        this.motionX *= (double)var1;
-        this.motionY *= (double)var1;
-        this.motionZ *= (double)var1;
+        this.motionY += 0.004D;
         this.moveEntity(this.motionX, this.motionY, this.motionZ);
+
+        if (this.posY == this.prevPosY)
+        {
+            this.motionX *= 1.1D;
+            this.motionZ *= 1.1D;
+        }
+
+        this.motionX *= 0.9999999785423279D;
+        this.motionY *= 0.9599999785423279D;
+        this.motionZ *= 0.9999999785423279D;
+
+        if (this.onGround)
+        {
+            this.motionX *= 0.699999988079071D;
+            this.motionZ *= 0.699999988079071D;
+        }
+    }
+    
+    public int getFXLayer()
+    {
+        return 0;
     }
 }

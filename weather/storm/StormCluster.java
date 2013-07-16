@@ -1,21 +1,24 @@
 package weather.storm;
 
-import net.minecraft.src.*;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-import weather.ExtendedRenderer;
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
 import weather.WeatherEntityConfig;
 import weather.WeatherMod;
 import weather.renderer.EntityAnimTexFX;
-import weather.renderer.EntityRotFX;
-
-import cpw.mods.fml.common.asm.SideOnly;
-import cpw.mods.fml.common.Side;
+import weather.renderer.EntityFallingRainFX;
+import weather.wind.WindHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import extendedrenderer.ExtendedRenderer;
+import extendedrenderer.particle.entity.EntityRotFX;
 @SideOnly(Side.CLIENT)
-public class StormCluster extends Entity
+public class StormCluster extends Entity implements WindHandler
 {
     public World worldRef;
     public List cloudEffects;
@@ -23,6 +26,8 @@ public class StormCluster extends Entity
     public int maxAge = 900;
 
     public static int updateLCG;
+    
+    public int type = 0;
 
     public StormCluster()
     {
@@ -32,9 +37,32 @@ public class StormCluster extends Entity
         this.updateLCG = (new Random()).nextInt();
         age = 0;
     }
+    
+    //rubes smooth texture render gl calls
+
+/*
+   GL11.glDisable(3553  GL_TEXTURE_2D );
+   		GL11.glShadeModel(7425  GL_SMOOTH );
+   		GL11.glEnable(3042  GL_BLEND );
+   		GL11.glBlendFunc(770, 1);
+   		GL11.glDisable(3008  GL_ALPHA_TEST );
+   		GL11.glDisable(2884  GL_CULL_FACE );
+   		GL11.glDepthMask(false);
+
+   GL11.glDepthMask(true);
+   		GL11.glEnable(2884  GL_CULL_FACE );
+   		GL11.glDisable(3042  GL_BLEND );
+   		GL11.glShadeModel(7424  GL_FLAT );
+   		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+   		GL11.glEnable(3553  GL_TEXTURE_2D );
+   		GL11.glEnable(3008  GL_ALPHA_TEST );
+*/
 
     public void onUpdate()
     {
+    	
+    	if (!worldObj.isRemote) return;
+    	
         //Entity target = null;//mod_EntMover.activeTornado;
         byte radius = 3;
         byte baseRadius = 9;
@@ -95,6 +123,13 @@ public class StormCluster extends Entity
                 }
             }
         }
+        
+        //Localized rain!
+        for (int i = 0; i < 10; i++) {
+        	
+            //FMLClientHandler.instance().getClient().effectRenderer.addEffect(ent);
+            //ent.spawnAsWeatherEffect();
+        }
 
         if (cloudEffects.size() > 0)
         {
@@ -122,12 +157,32 @@ public class StormCluster extends Entity
                 }
                 else if (var30 != null)
                 {
-                    WeatherMod.spin(this, (WeatherEntityConfig)WeatherMod.weatherEntTypes.get(1), var30);
+                    WeatherMod.spin(this, (WeatherEntityConfig)WeatherMod.weatherEntTypes.get(type != 1 ? type : 2), var30);
+                    var30.motionX *= 0.99F;
+                    var30.motionZ *= 0.99F;
                     //var30.setPosition(var30.posX, 127+var30.rand.nextDouble(), var30.posZ);
-                    var30.setPosition(var30.posX, var30.spawnY/*var30.posY+0.4*/, var30.posZ);
+                    //var30.setPosition(var30.posX, var30.spawnY/*var30.posY+0.4*/, var30.posZ);
+                    
+                    if (false && worldObj.getWorldTime() % 2 == 0) {
+	                    int size = 1;
+	                    
+	                    Random rand = new Random();
+	                    
+	                    EntityRotFX ent = new EntityFallingRainFX(worldRef, (double)var30.posX + rand.nextInt(size) - (size / 2), (double)var30.posY + 10, (double)var30.posZ + rand.nextInt(size) - (size / 2), 0D, -1D/*-5D - (rand.nextInt(5) * -1D)*/, 0D, 2.0D, 3);
+	                    ent.renderDistanceWeight = 1.0D;
+	                    ent.setSize(1.2F, 1.2F);
+	                    ent.rotationYaw = rand.nextInt(360) - 180F;
+	                    ent.setGravity(0.1F);
+	                    
+	                    ent.spawnAsWeatherEffect();
+	                    
+	                    //WeatherMod.instance.spawnQueue.add(ent);
+                    }
                 }
             }
         }
+        
+        //setDead();
     }
 
     @Override
@@ -167,4 +222,14 @@ public class StormCluster extends Entity
     {
         // TODO Auto-generated method stub
     }
+
+	@Override
+	public float getWindWeight() {
+		return 500;
+	}
+
+	@Override
+	public int getParticleDecayExtra() {
+		return 0;
+	}
 }

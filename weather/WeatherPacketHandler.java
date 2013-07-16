@@ -1,17 +1,14 @@
 package weather;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.network.INetworkManager;
+import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.world.World;
+
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 
 import weather.storm.EntTornado;
-
-import net.minecraft.src.Entity;
-import net.minecraft.src.INetworkManager;
-import net.minecraft.src.Packet250CustomPayload;
-import net.minecraft.src.World;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
 
@@ -74,8 +71,10 @@ public class WeatherPacketHandler implements IPacketHandler
                 	ent.posX = dis.readFloat();
                 	ent.posY = dis.readFloat();
                 	ent.posZ = dis.readFloat();
-                	ent.entConf = (WeatherEntityConfig)WeatherMod.weatherEntTypes.get(dis.readInt());
-                	//System.out.println("spawning client tornado: " + ent.entityId);
+                	int type = dis.readInt();
+                	ent.entConf = (WeatherEntityConfig)WeatherMod.weatherEntTypes.get(type);
+                	ent.entConfID = type;
+                	System.out.println("spawning client tornado, type: " + type);
                 	world.addWeatherEffect(ent);
                 } else if (state == 1) { //updating: id, posx, posy, posz, velx, vely, velz 
                 	int id = dis.readInt();

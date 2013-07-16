@@ -1,11 +1,25 @@
 package weather.waves;
 
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.asm.SideOnly;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.EntityFX;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.src.*;
+import weather.renderer.EntityWaterfallFX;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class EntityBuoyant extends Entity
 {
@@ -119,7 +133,7 @@ public class EntityBuoyant extends Entity
                     this.riddenByEntity.mountEntity(this);
                 }
 
-                this.dropItemWithOffset(Item.boat.shiftedIndex, 1, 0.0F);
+                this.dropItemWithOffset(Item.boat.itemID, 1, 0.0F);
                 this.setDead();
             }
 
@@ -200,6 +214,40 @@ public class EntityBuoyant extends Entity
         this.velocityZ = this.motionZ = par5;
     }
 
+    @SideOnly(Side.CLIENT)
+    public void spawnParticles(double speed) {
+    	
+    	double vecZ = boatPitch;
+    	
+    	Vec3 vec = Vec3.createVectorHelper(motionX, 0, motionZ);
+		float burst = 0.7F;//rand.nextFloat();
+		
+		vec.rotateAroundY(90);
+		EntityFX waterP;
+		int iter = 3 - Minecraft.getMinecraft().gameSettings.particleSetting; 
+		
+		int chance = Math.max(1, 10 - (int)(speed * 15));
+		//System.out.println("Chance: " + chance);
+		
+		for (int i = 0; i < iter; i++) {
+	    	waterP = new EntityWaterfallFX(worldObj, (double)posX, posY - 0.8D, posZ, vec.xCoord * burst, vec.yCoord + 5D, vec.zCoord * burst, 6D, 3);
+	    	if (rand.nextInt(chance) == 0) Minecraft.getMinecraft().effectRenderer.addEffect(waterP);
+		}
+    	
+    	vec.rotateAroundY(-180);
+    	
+    	for (int i = 0; i < iter; i++) {
+	    	waterP = new EntityWaterfallFX(worldObj, (double)posX, posY - 0.8D, posZ, vec.xCoord * burst, vec.yCoord + 5D, vec.zCoord * burst, 6D, 3);
+	    	if (rand.nextInt(chance) == 0) Minecraft.getMinecraft().effectRenderer.addEffect(waterP);
+    	}
+    	
+    	for (int i = 0; i < iter; i++) {
+    		float range = 0.1F;
+	    	waterP = new EntityWaterfallFX(worldObj, (double)posX, posY - 0.8D, posZ, ((rand.nextFloat() * range) - (range/2)), 0, ((rand.nextFloat() * range) - (range/2)), 6D, 3);
+	    	if (rand.nextInt(chance) == 0) Minecraft.getMinecraft().effectRenderer.addEffect(waterP);
+    	}
+    }
+    
     /**
      * Called to update the entity's position/logic.
      */
@@ -210,11 +258,24 @@ public class EntityBuoyant extends Entity
         //setDead();
         if (this.worldObj.isRemote)
         {
-            //System.out.println(motionY);
+            int what = 0;
             if (!this.isCollidedVertically)
             {
-                motionY -= 0.04F;
+                //motionY -= 0.04F;
             }
+        } else {
+        	int what = 0;
+        }
+        
+        //hacky fixes \\
+        if (this.isInWater()) {
+        	motionY += 0.04F;
+        } else {
+        	motionY -= 0.04F;
+        }
+        
+        if (this.motionY > 1F) {
+        	this.motionY = 1F;
         }
 
         if (this.getTimeSinceHit() > 0)
@@ -237,7 +298,7 @@ public class EntityBuoyant extends Entity
         {
             double var5 = this.boundingBox.minY + (this.boundingBox.maxY - this.boundingBox.minY) * (double)(var4 + 0) / (double)var1 - 0.125D;
             double var7 = this.boundingBox.minY + (this.boundingBox.maxY - this.boundingBox.minY) * (double)(var4 + 1) / (double)var1 - 0.125D;
-            AxisAlignedBB var9 = AxisAlignedBB.getAABBPool().addOrModifyAABBInPool(this.boundingBox.minX, var5, this.boundingBox.minZ, this.boundingBox.maxX, var7, this.boundingBox.maxZ);
+            AxisAlignedBB var9 = AxisAlignedBB.getAABBPool().getAABB(this.boundingBox.minX, var5, this.boundingBox.minZ, this.boundingBox.maxX, var7, this.boundingBox.maxZ);
 
             if (this.worldObj.isAABBInMaterial(var9, Material.water))
             {
@@ -261,7 +322,7 @@ public class EntityBuoyant extends Entity
                 double var15;
                 double var17;
 
-                if (this.rand.nextBoolean())
+                /*if (this.rand.nextBoolean())
                 {
                     var15 = this.posX - var6 * var11 * 0.8D + var8 * var13;
                     var17 = this.posZ - var8 * var11 * 0.8D - var6 * var13;
@@ -272,7 +333,19 @@ public class EntityBuoyant extends Entity
                     var15 = this.posX + var6 + var8 * var11 * 0.7D;
                     var17 = this.posZ + var8 - var6 * var11 * 0.7D;
                     this.worldObj.spawnParticle("splash", var15, this.posY - 0.125D, var17, this.motionX, this.motionY, this.motionZ);
-                }
+                }*/
+                
+                
+                
+                
+            }
+            
+            
+        }
+        
+        if (var24 > 0.035) {
+            if (worldObj.isRemote) {
+            	spawnParticles(var24);
             }
         }
 
@@ -390,7 +463,7 @@ public class EntityBuoyant extends Entity
 
                     for (var25 = 0; var25 < 2; ++var25)
                     {
-                        this.dropItemWithOffset(Item.stick.shiftedIndex, 1, 0.0F);
+                        this.dropItemWithOffset(Item.stick.itemID, 1, 0.0F);
                     }
                 }
             }
@@ -458,12 +531,12 @@ public class EntityBuoyant extends Entity
 
                         if (var22 == Block.snow.blockID)
                         {
-                            this.worldObj.setBlockWithNotify(var29, var21, var19, 0);
+                            this.worldObj.setBlock(var29, var21, var19, 0, 0, 2);
                         }
                         else if (var22 == Block.waterlily.blockID)
                         {
                             Block.waterlily.dropBlockAsItemWithChance(this.worldObj, var29, var21, var19, var23, 0.3F, 0);
-                            this.worldObj.setBlockWithNotify(var29, var21, var19, 0);
+                            this.worldObj.setBlock(var29, var21, var19, 0, 0, 2);
                         }
                     }
                 }

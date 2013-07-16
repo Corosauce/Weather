@@ -1,11 +1,14 @@
 package weather.blocks.structure.ai;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.util.DamageSource;
+
 import java.util.List;
 
-import CoroAI.*;
-import CoroAI.entity.*;
-
-import net.minecraft.src.*;
+import CoroAI.PFQueue;
+import CoroAI.entity.EnumJobState;
+import CoroAI.entity.JobManager;
 
 public class JobHunt extends JobBaseStructure {
 	

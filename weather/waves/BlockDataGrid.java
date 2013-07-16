@@ -25,6 +25,19 @@ public class BlockDataGrid
     {
         return getPoint(i, j, k).speed;
     }
+    
+    public BlockDataPoint getPoint(int i, int j, int k, boolean forceUpdate)
+    {
+    	
+    	int hash = getHash(i, j, k);
+    	//if (grid.get(hash) != null && grid.get(hash).height == 1F) {
+	    	BlockDataPoint newVec = new BlockDataPoint(i, j, k);
+	        grid.put(newVec.hash, newVec);
+	        return newVec;
+    	/*} else {
+    		return getPoint(i, j, k);
+    	}*/
+    }
 
     public BlockDataPoint getPoint(int i, int j, int k)
     {

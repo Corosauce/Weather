@@ -1,18 +1,16 @@
 package weather;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import weather.blocks.TileEntityTSiren;
+import weather.blocks.structure.tree.TileEntityVectorTree;
 import weather.storm.EntTornado;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.ServerCommandManager;
-import net.minecraft.src.World;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.relauncher.Side;
 
 public class CommonProxy implements IGuiHandler
 {
@@ -36,6 +34,12 @@ public class CommonProxy implements IGuiHandler
 		//EntityRegistry.registerGlobalEntityID(c_w_MovingBlockStructure.class, "c_w_MovingBlockStructure", entityId-1,0,0);
         //EntityRegistry.registerModEntity(EntityKoaManly.class, "Koa Man", entityId++, mod, 64, 1, true);
         GameRegistry.registerTileEntity(TileEntityTSiren.class, "c_w_TileEntityTSiren");
+        GameRegistry.registerTileEntity(TileEntityVectorTree.class, "VectorTree");
+    }
+    
+    public void postInit(WeatherMod pMod)
+    {
+    	
     }
 
     public int getUniqueTextureLoc()
@@ -105,7 +109,7 @@ public class CommonProxy implements IGuiHandler
         return null;
     }
 
-    public void newAnimParticle(String name, World worldRef, EntTornado tornadoRef, double posX, double posY, double posZ, double velX, double velY, double velZ, double maxAge, int[] texArr, int colorID)
+    public void newAnimParticle(String name, World worldRef, EntTornado tornadoRef, double posX, double posY, double posZ, double velX, double velY, double velZ, double maxAge, int[] texArr, int colorID, float scale)
     {
         //nada
     }

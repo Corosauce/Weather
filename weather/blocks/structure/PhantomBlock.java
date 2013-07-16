@@ -1,34 +1,32 @@
 package weather.blocks.structure;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
 import java.util.List;
-import java.lang.reflect.Field;
 
 import weather.WeatherMod;
+import weather.config.ConfigTornado;
 import weather.wind.WindHandler;
-
 import CoroAI.PFQueue;
 import CoroAI.PathEntityEx;
-import CoroAI.c_IEnhAI;
 import CoroAI.c_IEnhPF;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-
-import net.minecraft.src.AxisAlignedBB;
-import net.minecraft.src.Block;
-import net.minecraft.src.BlockContainer;
-import net.minecraft.src.DamageSource;
-import net.minecraft.src.Entity;
-import net.minecraft.src.Material;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.MovingObjectPosition;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.PathEntity;
-import net.minecraft.src.TileEntity;
-import net.minecraft.src.Vec3;
-import net.minecraft.src.World;
 
 public class PhantomBlock extends Entity implements IEntityAdditionalSpawnData, c_IEnhPF, WindHandler
 {
@@ -103,7 +101,7 @@ public class PhantomBlock extends Entity implements IEntityAdditionalSpawnData, 
         if (this.tileentity != null)
         {
             var1.setBlockTileEntity(var2, var3, var4, ((BlockContainer)Block.blocksList[this.tile]).createNewTileEntity(var1));
-            var1.setBlockAndMetadataWithNotify(var2, var3, var4, 0, 0);
+            var1.setBlock(var2, var3, var4, 0, 0, 2);
         }
     }
 
@@ -192,12 +190,12 @@ public class PhantomBlock extends Entity implements IEntityAdditionalSpawnData, 
             {
                 this.mode = 0;
 
-                if (this.tileentity == null && WeatherMod.Storm_Tornado_rarityOfDisintegrate != -1 && this.rand.nextInt((WeatherMod.Storm_Tornado_rarityOfDisintegrate + 1) * 20) == 0)
+                if (this.tileentity == null && ConfigTornado.Storm_Tornado_rarityOfDisintegrate != -1 && this.rand.nextInt((ConfigTornado.Storm_Tornado_rarityOfDisintegrate + 1) * 20) == 0)
                 {
                     //this.setEntityDead();
                 }
 
-                if (this.tileentity == null && WeatherMod.Storm_Tornado_rarityOfFirenado != -1 && this.rand.nextInt((WeatherMod.Storm_Tornado_rarityOfFirenado + 1) * 20) == 0)
+                if (this.tileentity == null && ConfigTornado.Storm_Tornado_rarityOfFirenado != -1 && this.rand.nextInt((ConfigTornado.Storm_Tornado_rarityOfFirenado + 1) * 20) == 0)
                 {
                     this.tile = Block.fire.blockID;
                 }
@@ -450,7 +448,7 @@ public class PhantomBlock extends Entity implements IEntityAdditionalSpawnData, 
         
         //System.out.println("trying place");
         
-        if (this.worldObj.setBlockAndMetadataWithNotify(destX, destY, destZ, this.tile, this.metadata)) {
+        if (this.worldObj.setBlock(destX, destY, destZ, this.tile, this.metadata, 2)) {
         	
         }
 
@@ -458,25 +456,25 @@ public class PhantomBlock extends Entity implements IEntityAdditionalSpawnData, 
         {
             if (!WeatherMod.shouldRemoveBlock(var5) && !WeatherMod.isOceanBlock(var5) && var2 < 255)
             {
-                this.worldObj.setBlockAndMetadataWithNotify(var1, var2 + 1, var3, this.tile, this.metadata);
+                this.worldObj.setBlock(var1, var2 + 1, var3, this.tile, this.metadata);
             }
 
             boolean var6 = false;
 
             if (!WeatherMod.isOceanBlock(var5))
             {
-                if (this.worldObj.setBlockAndMetadataWithNotify(var1, var2, var3, this.tile, this.metadata))
+                if (this.worldObj.setBlock(var1, var2, var3, this.tile, this.metadata))
                 {
                     var6 = true;
                 }
             }
             else
             {
-                this.worldObj.setBlockAndMetadataWithNotify(var1, var2, var3, WeatherMod.finiteWaterId, this.metadata);
+                this.worldObj.setBlock(var1, var2, var3, WeatherMod.finiteWaterId, this.metadata);
 
                 if (var2 < 255)
                 {
-                    this.worldObj.setBlockAndMetadataWithNotify(var1, var2 + 1, var3, WeatherMod.finiteWaterId, this.metadata);
+                    this.worldObj.setBlock(var1, var2 + 1, var3, WeatherMod.finiteWaterId, this.metadata);
                 }
             }
 
@@ -718,5 +716,11 @@ public class PhantomBlock extends Entity implements IEntityAdditionalSpawnData, 
 	public float getWindWeight() {
 		// TODO Auto-generated method stub
 		return 9999;
+	}
+
+	@Override
+	public int getParticleDecayExtra() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

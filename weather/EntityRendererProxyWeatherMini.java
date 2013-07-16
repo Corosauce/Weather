@@ -1,32 +1,25 @@
 package weather;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.BiomeGenBase;
-import net.minecraft.src.Block;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityFX;
-import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityRainFX;
-import net.minecraft.src.EntityRenderer;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.src.EntityRendererProxy;
-import net.minecraft.src.EntitySmokeFX;
-import net.minecraft.src.Material;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.Tessellator;
-import net.minecraft.src.World;
-import net.minecraft.src.c_CoroWeatherUtil;
-
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GLContext;
-import org.lwjgl.util.glu.GLU;
-
-import weather.renderer.EntityFallingRainFX;
-import weather.renderer.EntityRotFX;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 
 import java.util.Random;
+
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+
+import extendedrenderer.particle.entity.EntityRotFX;
+
+
+import weather.config.ConfigTornado;
+import weather.renderer.EntityFallingRainFX;
 
 public class EntityRendererProxyWeatherMini extends EntityRendererProxy
 {
@@ -60,29 +53,6 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
         //ModLoader.OnTick(var1, this.game);
     }
 
-    public void enableLightmap2(double var1)
-    {
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-        GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        GL11.glMatrixMode(GL11.GL_TEXTURE);
-        GL11.glLoadIdentity();
-        float var3 = 0.00390625F;
-        GL11.glScalef(var3, var3, var3);
-        GL11.glTranslatef(8.0F, 8.0F, 8.0F);
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        this.mc.renderEngine.bindTexture(this.lightmapTexture);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-    }
-
     public void disableLightMap2(double var1)
     {
         GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
@@ -102,8 +72,25 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
     @Override
     protected void renderRainSnow(float par1)
     {
+    	if (ConfigTornado.smoothRain)
+        {
+    		
+        } else {
+        	super.renderRainSnow(par1);
+        	return;
+        }
         //if (true) { super.renderRainSnow(par1); return; }
-        this.rendererUpdateCount = (Integer)c_CoroWeatherUtil.getPrivateValueBoth(EntityRenderer.class, this, "t", "rendererUpdateCount");
+    	/*Object obj = c_CoroWeatherUtil.getPrivateValueBoth(EntityRenderer.class, this, "t", "rendererUpdateCount");
+    	if (obj != null) {
+    		 = (Integer) obj;
+    	} else {
+    		System.out.println("reflection failing in renderRainSnow");
+    	}*/
+    	
+    	
+    	
+    	this.rendererUpdateCount++;
+    	
         /*try {
            this.rendererUpdateCount = (Integer)ModLoader.getPrivateValue(EntityRenderer.class, this, "t");
         } catch (Exception ex) {
@@ -139,6 +126,7 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
 
             EntityLiving var41 = this.mc.renderViewEntity;
             World var42 = this.mc.theWorld;
+            
             int var43 = MathHelper.floor_double(var41.posX);
             int var44 = MathHelper.floor_double(var41.posY);
             int var45 = MathHelper.floor_double(var41.posZ);
@@ -163,17 +151,6 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
             boolean var17 = false;
             byte var18 = -1;
             float var19 = (float)this.rendererUpdateCount + par1;
-
-            if (this.mc.gameSettings.fancyGraphics)
-            {
-                var16 = 10;
-            }
-
-            // CODE ADDITION
-            if (ExtendedRenderer.smoothRain)
-            {
-                //var16 = 1;
-            }
 
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             var17 = false;
@@ -220,9 +197,9 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
 
                             if (var42.getWorldChunkManager().getTemperatureAtHeight(var31, var26) >= 0.15F)
                             {
-                                if (ExtendedRenderer.smoothRain)
+                                if (ConfigTornado.smoothRain)
                                 {
-                                    if (mc.theWorld != null && mc.theWorld.getWorldInfo().getWorldTime() != lastWorldTime)
+                                    if (!mc.isGamePaused && mc.theWorld != null && mc.theWorld.getWorldInfo().getWorldTime() != lastWorldTime)
                                     {
                                     	int rr = 50 - (rainRate * 4);
                                     	if (rr < 1) { rr = 1; }
@@ -251,34 +228,6 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
                                             }
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    if (var18 != 0)
-                                    {
-                                        if (var18 >= 0)
-                                        {
-                                            var8.draw();
-                                        }
-
-                                        var18 = 0;
-                                        GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/environment/rain.png"));
-                                        var8.startDrawingQuads();
-                                    }
-
-                                    var32 = ((float)(this.rendererUpdateCount + var21 * var21 * 3121 + var21 * 45238971 + var20 * var20 * 418711 + var20 * 13761 & 31) + par1) / 32.0F * (3.0F + this.random.nextFloat());
-                                    double var33 = (double)((float)var21 + 0.5F) - var41.posX;
-                                    var35 = (double)((float)var20 + 0.5F) - var41.posZ;
-                                    float var37 = MathHelper.sqrt_double(var33 * var33 + var35 * var35) / (float)var16;
-                                    float var38 = 1.0F;
-                                    var8.setBrightness(var42.getLightBrightnessForSkyBlocks(var21, var30, var20, 0));
-                                    var8.setColorRGBA_F(var38, var38, var38, ((1.0F - var37 * var37) * 0.5F + 0.5F) * var2);
-                                    var8.setTranslation(-var9 * 1.0D, -var11 * 1.0D, -var13 * 1.0D);
-                                    var8.addVertexWithUV((double)((float)var21 - var23) + 0.5D, (double)var27, (double)((float)var20 - var24) + 0.5D, (double)(0.0F * var29), (double)((float)var27 * var29 / 4.0F + var32 * var29));
-                                    var8.addVertexWithUV((double)((float)var21 + var23) + 0.5D, (double)var27, (double)((float)var20 + var24) + 0.5D, (double)(1.0F * var29), (double)((float)var27 * var29 / 4.0F + var32 * var29));
-                                    var8.addVertexWithUV((double)((float)var21 + var23) + 0.5D, (double)var28, (double)((float)var20 + var24) + 0.5D, (double)(1.0F * var29), (double)((float)var28 * var29 / 4.0F + var32 * var29));
-                                    var8.addVertexWithUV((double)((float)var21 - var23) + 0.5D, (double)var28, (double)((float)var20 - var24) + 0.5D, (double)(0.0F * var29), (double)((float)var28 * var29 / 4.0F + var32 * var29));
-                                    var8.setTranslation(0.0D, 0.0D, 0.0D);
                                 }
                             }
                             else
@@ -327,22 +276,9 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
             this.disableLightmap((double)par1);
         }
 
+        lastWorldTime = mc.theWorld.getWorldInfo().getWorldTime();
+        
         // NEW CODE START \\
-
-        if (mc.theWorld != null && mc.theWorld.getWorldInfo().getWorldTime() != lastWorldTime)
-        {
-            lastWorldTime = mc.theWorld.getWorldInfo().getWorldTime();
-
-            if (!mc.isGamePaused)
-            {
-                ExtendedRenderer.rotEffRenderer.updateEffects();
-                //if (mc.theWorld.worldInfo.getWorldTime() % 2 == 0) {
-                //}
-            }
-        }
-
-        //Rotating particles hook
-        ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.renderViewEntity, (float)par1);
         WeatherMod.renderHook(par1);
         // NEW CODE END //
     }

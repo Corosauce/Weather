@@ -1,11 +1,14 @@
 package weather.waves;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+
 import java.util.Arrays;
 import java.util.Random;
 
 import weather.WeatherMod;
-
-import net.minecraft.src.*;
 
 public class BlockDataPoint
 {
@@ -58,7 +61,7 @@ public class BlockDataPoint
             if (isBlockWater(worldRef.getBlockId(xCoord, yCoord, zCoord)))
             {
                 isWater = true;
-                angle = calcShoreAngle();
+                //angle = calcShoreAngle();
             }
         }
     }

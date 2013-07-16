@@ -1,24 +1,15 @@
 package weather.blocks.structure;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.*;
-import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.src.ModLoader;
+import net.minecraft.world.World;
+
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.asm.SideOnly;
-import cpw.mods.fml.common.registry.TickRegistry;
-import cpw.mods.fml.common.Side;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class ClientProxy extends CommonProxy
 {

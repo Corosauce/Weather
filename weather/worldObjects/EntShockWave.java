@@ -1,21 +1,20 @@
 package weather.worldObjects;
 
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.src.ModLoader;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
+
 import java.util.List;
 
 import weather.WeatherMod;
 import weather.blocks.MovingBlock;
-
-import net.minecraft.src.AxisAlignedBB;
-import net.minecraft.src.Block;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityLiving;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.World;
-import cpw.mods.fml.common.asm.SideOnly;
-import cpw.mods.fml.common.Side;
+import weather.config.ConfigTornado;
 
 public class EntShockWave extends Entity
 {
@@ -57,9 +56,9 @@ public class EntShockWave extends Entity
         boolean var4 = false;
         int var5 = this.worldObj.getBlockId(var1, var2, var3);
 
-        if (var5 != 0 && this.worldObj.getBlockTileEntity(var1, var2, var3) == null && WeatherMod.blockCount <= WeatherMod.Storm_Tornado_maxBlocks)
+        if (var5 != 0 && this.worldObj.getBlockTileEntity(var1, var2, var3) == null && WeatherMod.blockCount <= ConfigTornado.Storm_Tornado_maxBlocks)
         {
-            this.worldObj.setBlockWithNotify(var1, var2, var3, 0);
+            this.worldObj.setBlock(var1, var2, var3, 0, 0, 2);
 
             if (var5 != Block.snow.blockID)
             {

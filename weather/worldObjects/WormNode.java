@@ -1,7 +1,8 @@
 package weather.worldObjects;
 
+import net.minecraft.world.World;
+
 import weather.blocks.MovingBlock;
-import net.minecraft.src.World;
 
 public class WormNode
 {

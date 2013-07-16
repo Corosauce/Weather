@@ -1,15 +1,7 @@
 package weather.blocks.structure;
 
 import java.util.List;
-import java.util.LinkedList;
 import java.util.Random;
-import java.lang.reflect.Field;
-
-import weather.WeatherMod;
-
-import net.minecraft.src.Entity;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.World;
 
 public class StructureTemplates
 {

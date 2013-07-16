@@ -1,21 +1,26 @@
 package weather.waves;
 
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.asm.SideOnly;
+import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.model.ModelBoat;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.MathHelper;
+
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.src.*;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class RenderSurfboard extends Render
 {
     /** instance of ModelBoat for rendering */
-    protected ModelBase modelBoat;
+    protected ModelSurfboard modelBoat;
 
     public RenderSurfboard()
     {
         this.shadowSize = 0.5F;
-        this.modelBoat = new ModelBoat();
+        this.modelBoat = new ModelSurfboard();
     }
 
     /**
@@ -25,7 +30,8 @@ public class RenderSurfboard extends Render
     {
         GL11.glPushMatrix();
         GL11.glTranslatef((float)par2, (float)par4, (float)par6);
-        GL11.glRotatef(180.0F - par8, 0.0F, 1.0F, 0.0F);
+        GL11.glRotatef(270.0F - par8, 0.0F, 1.0F, 0.0F);
+        GL11.glTranslatef(0.25F, 0.15F, 0);
         float var10 = (float)par1EntityBoat.getTimeSinceHit() - par9;
         float var11 = (float)par1EntityBoat.getDamageTaken() - par9;
 
@@ -43,7 +49,7 @@ public class RenderSurfboard extends Render
         float var12 = 0.75F;
         GL11.glScalef(var12, var12, var12);
         GL11.glScalef(1.0F / var12, 1.0F / var12, 1.0F / var12);
-        this.loadTexture("/item/boat.png");
+        this.loadTexture("/coro/weather/SurfBoard.png");
         GL11.glScalef(-1.0F, -1.0F, 1.0F);
         this.modelBoat.render(par1EntityBoat, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
         GL11.glPopMatrix();

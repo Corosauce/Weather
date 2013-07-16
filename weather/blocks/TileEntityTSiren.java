@@ -1,17 +1,15 @@
 package weather.blocks;
 
-import java.util.List;
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.src.ModLoader;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
 
 import weather.WeatherMod;
 import weather.storm.EntTornado;
-
-import net.minecraft.src.Entity;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.TileEntity;
-import cpw.mods.fml.common.asm.SideOnly;
-import cpw.mods.fml.common.Side;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class TileEntityTSiren extends TileEntity
 {
@@ -39,7 +37,7 @@ public class TileEntityTSiren extends TileEntity
             }*/
             EntTornado entT = WeatherMod.activeTornado;
 
-            if (entT != null && entT.getStorm().type != entT.getStorm().TYPE_SPOUT)
+            if (entT != null && !entT.isDead && entT.getStorm().type != entT.getStorm().TYPE_SPOUT)
             {
                 if (WeatherMod.activeTornado.getDistance(xCoord, yCoord, zCoord) < 180)
                 {

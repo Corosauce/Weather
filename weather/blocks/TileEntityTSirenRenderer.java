@@ -1,7 +1,7 @@
 package weather.blocks;
 
-import net.minecraft.src.TileEntity;
-import net.minecraft.src.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityTSirenRenderer extends TileEntitySpecialRenderer
 {

@@ -1,18 +1,13 @@
 package weather.blocks.structure;
 
+import net.minecraft.world.World;
+
 import java.util.EnumSet;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.src.GuiScreen;
-import net.minecraft.src.ServerCommandManager;
-import net.minecraft.src.World;
-
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ITickHandler;
-import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.TickType;
-import cpw.mods.fml.common.registry.EntityRegistry;
+import cpw.mods.fml.relauncher.Side;
 
 public class ServerTickHandler implements ITickHandler {
 

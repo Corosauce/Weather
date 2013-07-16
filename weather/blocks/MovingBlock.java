@@ -1,27 +1,27 @@
 package weather.blocks;
 
 import java.util.List;
-import java.lang.reflect.Field;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import weather.WeatherMod;
+import weather.config.ConfigTornado;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-
-import net.minecraft.src.AxisAlignedBB;
-import net.minecraft.src.Block;
-import net.minecraft.src.BlockContainer;
-import net.minecraft.src.DamageSource;
-import net.minecraft.src.Entity;
-import net.minecraft.src.Material;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.MovingObjectPosition;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.TileEntity;
-import net.minecraft.src.Vec3;
-import net.minecraft.src.World;
 
 public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 {
@@ -82,7 +82,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         if (this.tileentity != null)
         {
             var1.setBlockTileEntity(var2, var3, var4, ((BlockContainer)Block.blocksList[this.tile]).createNewTileEntity(var1));
-            var1.setBlockAndMetadataWithNotify(var2, var3, var4, 0, 0);
+            var1.setBlock(var2, var3, var4, 0, 0, 2);
         }
     }
 
@@ -112,7 +112,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     {
         if (this.tile == 0)
         {
-            this.setEntityDead();
+            this.setDead();
         }
         else
         {
@@ -122,12 +122,12 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
             {
                 this.mode = 0;
 
-                if (this.tileentity == null && WeatherMod.Storm_Tornado_rarityOfDisintegrate != -1 && this.rand.nextInt((WeatherMod.Storm_Tornado_rarityOfDisintegrate + 1) * 20) == 0)
+                if (this.tileentity == null && ConfigTornado.Storm_Tornado_rarityOfDisintegrate != -1 && this.rand.nextInt((ConfigTornado.Storm_Tornado_rarityOfDisintegrate + 1) * 20) == 0)
                 {
-                    this.setEntityDead();
+                    this.setDead();
                 }
 
-                if (this.tileentity == null && WeatherMod.Storm_Tornado_rarityOfFirenado != -1 && this.rand.nextInt((WeatherMod.Storm_Tornado_rarityOfFirenado + 1) * 20) == 0)
+                if (this.tileentity == null && ConfigTornado.Storm_Tornado_rarityOfFirenado != -1 && this.rand.nextInt((ConfigTornado.Storm_Tornado_rarityOfFirenado + 1) * 20) == 0)
                 {
                     this.tile = Block.fire.blockID;
                 }
@@ -182,7 +182,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
             Entity var4 = null;
             List var5 = null;
 
-            if (this.age > this.gravityDelay)
+            if (this.age > this.gravityDelay / 4)
             {
                 var5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ));
             }
@@ -196,11 +196,21 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
             {
                 Entity var10 = (Entity)var5.get(var8);
 
-                if (!(var10 instanceof MovingBlock) && var10.canBeCollidedWith())
+                if (!(var10 instanceof MovingBlock) && var10.canBeCollidedWith() && this.canEntityBeSeen(var10))
                 {
-                    var10.motionX = this.motionX / 2.0D;
-                    var10.motionY = this.motionY / 2.0D;
-                    var10.motionZ = this.motionZ / 2.0D;
+                	if (!(var10 instanceof EntityPlayer) || !((EntityPlayer)var10).capabilities.isCreativeMode) {
+	                    var10.motionX = this.motionX / 1.5D;
+	                    var10.motionY = this.motionY / 1.5D;
+	                    var10.motionZ = this.motionZ / 1.5D;
+                	}
+                    
+                    if (ConfigTornado.Storm_FlyingBlocksHurt && Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ) > 0.4F) {
+                    	//System.out.println("damaging with block: " + var10);
+                    	
+                    	DamageSource ds = DamageSource.causeThrownDamage(this, this);
+                		ds.damageType = "wm.movingblock";
+                		var10.attackEntityFrom(ds, 4);
+                    }
                 }
 
                 if (var10.canBeCollidedWith() && !this.noCollision)
@@ -299,8 +309,9 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
                         if (!this.collideFalling)
                         {
                             this.collideFalling = true;
-                            this.posX = (double)((int)(this.posX + 0.0D));
-                            this.posZ = (double)((int)(this.posZ + 0.0D));
+                            this.posX = MathHelper.floor_double(posX);
+                            this.posZ = MathHelper.floor_double(posZ);
+                            //this.posZ = (double)((int)(this.posZ + 0.0D));
                             this.setPosition(this.posX, this.posY, this.posZ);
                             this.motionX = 0.0D;
                             this.motionZ = 0.0D;
@@ -347,7 +358,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 
             if (!this.worldObj.checkChunksExist(var11, var20, var21, var11, var20, var21))
             {
-                this.setEntityDead();
+                this.setDead();
             }
 
             this.prevPosX = this.posX;
@@ -371,10 +382,15 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
             this.setPosition(this.posX, this.posY, this.posZ);
         }
     }
+    
+    public boolean canEntityBeSeen(Entity par1Entity)
+    {
+        return this.worldObj.rayTraceBlocks(this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX, this.posY + (double)this.getEyeHeight(), this.posZ), this.worldObj.getWorldVec3Pool().getVecFromPool(par1Entity.posX, par1Entity.posY + (double)par1Entity.getEyeHeight(), par1Entity.posZ)) == null;
+    }
 
     private void blockify(int var1, int var2, int var3, int var4)
     {
-        this.setEntityDead();
+        this.setDead();
         int var5 = this.worldObj.getBlockId(var1, var2, var3);
 
         if (var5 != 0)
@@ -382,29 +398,29 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
             ;
         }
 
-        if (this.tileentity != null || this.type != 0 || WeatherMod.Storm_Tornado_rarityOfBreakOnFall > 0 && this.rand.nextInt(WeatherMod.Storm_Tornado_rarityOfBreakOnFall + 1) != 0)
+        if (this.tileentity != null || this.type != 0 || ConfigTornado.Storm_Tornado_rarityOfBreakOnFall > 0 && this.rand.nextInt(ConfigTornado.Storm_Tornado_rarityOfBreakOnFall + 1) != 0)
         {
             if (!WeatherMod.shouldRemoveBlock(var5) && !WeatherMod.isOceanBlock(var5) && var2 < 255)
             {
-                this.worldObj.setBlockAndMetadataWithNotify(var1, var2 + 1, var3, this.tile, this.metadata);
+                this.worldObj.setBlock(var1, var2 + 1, var3, this.tile, this.metadata, 3);
             }
 
             boolean var6 = false;
 
             if (!WeatherMod.isOceanBlock(var5))
             {
-                if (this.worldObj.setBlockAndMetadataWithNotify(var1, var2, var3, this.tile, this.metadata))
+                if (this.worldObj.setBlock(var1, var2, var3, this.tile, this.metadata, 3))
                 {
                     var6 = true;
                 }
             }
             else
             {
-                this.worldObj.setBlockAndMetadataWithNotify(var1, var2, var3, WeatherMod.finiteWaterId, this.metadata);
+                this.worldObj.setBlock(var1, var2, var3, WeatherMod.finiteWaterId, this.metadata, 3);
 
                 if (var2 < 255)
                 {
-                    this.worldObj.setBlockAndMetadataWithNotify(var1, var2 + 1, var3, WeatherMod.finiteWaterId, this.metadata);
+                    this.worldObj.setBlock(var1, var2 + 1, var3, WeatherMod.finiteWaterId, this.metadata, 3);
                 }
             }
 
@@ -424,10 +440,12 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         return false;
     }
 
+    @Override
     protected void writeEntityToNBT(NBTTagCompound var1)
     {
         var1.setByte("Tile", (byte)this.tile);
         var1.setByte("Metadata", (byte)this.metadata);
+        var1.setInteger("blocktype", type);
         NBTTagCompound var2 = new NBTTagCompound();
 
         if (this.tileentity != null)
@@ -436,12 +454,16 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         }
 
         var1.setCompoundTag("TileEntity", var2);
+        
+        
     }
 
+    @Override
     protected void readEntityFromNBT(NBTTagCompound var1)
     {
         this.tile = var1.getByte("Tile") & 255;
         this.metadata = var1.getByte("Metadata") & 15;
+        this.type = var1.getInteger("blocktype");
         this.tileentity = null;
 
         if (Block.blocksList[this.tile] instanceof BlockContainer)
@@ -450,6 +472,8 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
             NBTTagCompound var2 = var1.getCompoundTag("TileEntity");
             this.tileentity.readFromNBT(var2);
         }
+        
+        if (type == 0) setDead(); //kill flying block on reload for tornado spazing fix
     }
 
     public float getShadowSize()
@@ -467,14 +491,17 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         return this.worldObj;
     }
 
-    public void setEntityDead()
+    @Override
+    public void setDead()
     {
-        --WeatherMod.blockCount;
-
-        if (WeatherMod.blockCount < 0)
-        {
-            WeatherMod.blockCount = 0;
-        }
+    	if (!worldObj.isRemote) {
+	        --WeatherMod.blockCount;
+	
+	        if (WeatherMod.blockCount < 0)
+	        {
+	            WeatherMod.blockCount = 0;
+	        }
+    	}
 
         super.setDead();
     }

@@ -1,16 +1,15 @@
 package weather.worldObjects;
 
-import net.minecraft.src.GuiButton;
-import net.minecraft.src.GuiScreen;
-import net.minecraftforge.common.Configuration;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 
 import org.lwjgl.opengl.GL11;
 
-import weather.ExtendedRenderer;
 import weather.ServerTickHandler;
 import weather.WeatherMod;
+import weather.config.ConfigTornado;
+import weather.config.ConfigWavesMisc;
 import weather.storm.StormManager;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 
 public class GuiWeatherCP extends GuiScreen
@@ -45,9 +44,10 @@ public class GuiWeatherCP extends GuiScreen
             return;
         }
 
-        int var4 = this.mc.renderEngine.getTexture("/coro/weather/weatherGui.png");
+        //int var4 = this.mc.renderEngine.getTexture("/coro/weather/weatherGui.png");
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.renderEngine.bindTexture(var4);
+        this.mc.renderEngine.bindTexture("/coro/weather/weatherGui.png");
+        //GL11.glBindTexture(GL11.GL_TEXTURE_2D, var4);
         int var5 = (this.width - this.xSize) / 2;
         int var6 = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(var5 + xOffset, var6, 0, 0, this.xSize, ySize);
@@ -68,29 +68,29 @@ public class GuiWeatherCP extends GuiScreen
         ySize = 200;
         xOffset = (int)(this.width / 4 * 1.92);
         this.updateCounter2 = 0;
-        this.controlList.clear();
+        this.buttonList.clear();
         byte var1 = -16;
         int startX = ((this.width - this.xSize) / 2) + xOffset + 6;
         int startY = (this.height - this.ySize) / 2 + 23;
         int div = 22;
-        this.controlList.add(new GuiButton(G_RAIN, startX, startY + 0 + var1, 90, 20, "Particle Rain"));
-        this.controlList.add(new GuiButton(G_TOGGLEWAVERANGE, startX, startY + div * 1 + var1, 90, 20, "Set Wave Range"));
+        this.buttonList.add(new GuiButton(G_RAIN, startX, startY + 0 + var1, 90, 20, "Particle Rain"));
+        this.buttonList.add(new GuiButton(G_TOGGLEWAVERANGE, startX, startY + div * 1 + var1, 90, 20, "Set Wave Range"));
         if (FMLCommonHandler.instance().getMinecraftServerInstance() != null) {
-        	this.controlList.add(new GuiButton(G_TOGGLEWAVEHEIGHT, startX, startY + div * 2 + var1, 90, 20, "Set Wave Height"));
+        	this.buttonList.add(new GuiButton(G_TOGGLEWAVEHEIGHT, startX, startY + div * 2 + var1, 90, 20, "Set Wave Height"));
         }
-        //this.controlList.add(new GuiButton(G_SPAWNTORNADO, startX, startY + div * 1 + var1, 90, 20, "Force Tornado"));
-        //this.controlList.add(new GuiButton(G_SPAWNSTORM, startX, startY + div * 2 + var1, 90, 20, "Spawn Storm"));
-        //this.controlList.add(new GuiButton(G_PREVSTAGE, startX, startY + div * 3 + var1, 90, 20, "Prev Stage"));
-        //this.controlList.add(new GuiButton(G_NEXTSTAGE, startX, startY + div * 4 + var1, 90, 20, "Next Stage"));
-        this.controlList.add(new GuiButton(G_DEBUG, startX, startY + div * 5 + var1, 90, 20, "Debug Info"));
-        this.controlList.add(new GuiButton(G_CLOSE, startX, startY + div * 6 + var1, 90, 20, "Close"));
+        //this.buttonList.add(new GuiButton(G_SPAWNTORNADO, startX, startY + div * 1 + var1, 90, 20, "Force Tornado"));
+        this.buttonList.add(new GuiButton(G_SPAWNSTORM, startX, startY + div * 3 + var1, 90, 20, "Spawn Storm"));
+        //this.buttonList.add(new GuiButton(G_PREVSTAGE, startX, startY + div * 3 + var1, 90, 20, "Prev Stage"));
+        //this.buttonList.add(new GuiButton(G_NEXTSTAGE, startX, startY + div * 4 + var1, 90, 20, "Next Stage"));
+        this.buttonList.add(new GuiButton(G_DEBUG, startX, startY + div * 5 + var1, 90, 20, "Debug Info"));
+        this.buttonList.add(new GuiButton(G_CLOSE, startX, startY + div * 6 + var1, 90, 20, "Close"));
     }
 
     protected void actionPerformed(GuiButton var1)
     {
         if (var1.id == G_RAIN)
         {
-            ExtendedRenderer.smoothRain = !ExtendedRenderer.smoothRain;
+        	ConfigTornado.smoothRain = !ConfigTornado.smoothRain;
         }
 
         if (var1.id == G_DEBUG)
@@ -111,14 +111,14 @@ public class GuiWeatherCP extends GuiScreen
         if (var1.id == G_SPAWNTORNADO)
         {
             //mod_EntMover.t_SpawnTornado = true;
-            WeatherMod.t_trySpawnTornado = true;
+            //WeatherMod.t_trySpawnTornado = true;
         }
         
         if (var1.id == G_TOGGLEWAVERANGE)
         {
-            WeatherMod.waveRenderRange += 20;
-            if (WeatherMod.waveRenderRange > 150) {
-            	WeatherMod.waveRenderRange = 0;
+            ConfigWavesMisc.waveRenderRange += 20;
+            if (ConfigWavesMisc.waveRenderRange > 150) {
+            	ConfigWavesMisc.waveRenderRange = 0;
             }
             //cant save out D:
             //WeatherMod.preInitConfig.getOrCreateIntProperty("waveRenderRange", Configuration.CATEGORY_GENERAL, WeatherMod.waveRenderRange).getInt();

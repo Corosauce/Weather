@@ -1,13 +1,12 @@
 package weather.blocks.structure.ai;
 
-import java.util.List;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.DamageSource;
 
 import weather.blocks.structure.Structure;
-
-import CoroAI.*;
-import CoroAI.entity.*;
-
-import net.minecraft.src.*;
+import CoroAI.entity.EnumJobState;
+import CoroAI.entity.JobManager;
 
 public class JobBaseStructure {
 	

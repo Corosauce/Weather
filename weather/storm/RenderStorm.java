@@ -1,8 +1,8 @@
 package weather.storm;
 
-import net.minecraft.src.Entity;
-import net.minecraft.src.Render;
-import net.minecraft.src.World;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.entity.Entity;
+import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
 

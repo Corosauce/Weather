@@ -1,11 +1,12 @@
 package weather.waves;
 
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+
 import weather.ServerTickHandler;
 import weather.storm.StormManager;
-import net.minecraft.src.CommandBase;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.EntityPlayerMP;
-import net.minecraft.src.ICommandSender;
 
 public class CommandWaveHeight extends CommandBase
 {

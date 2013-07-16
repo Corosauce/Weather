@@ -1,14 +1,13 @@
 package weather.blocks.structure;
 
-import java.util.List;
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
+
 import java.util.LinkedList;
-import java.lang.reflect.Field;
+import java.util.List;
 
 import weather.WeatherMod;
-
-import net.minecraft.src.Entity;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.World;
 
 public class StructurePiece extends Entity
 {

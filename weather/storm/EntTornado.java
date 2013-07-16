@@ -1,41 +1,41 @@
 package weather.storm;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.effect.EntityLightningBolt;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.ModLoader;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import weather.WeatherEntityConfig;
+import weather.WeatherMod;
+import weather.blocks.MovingBlock;
+import weather.config.ConfigTornado;
+import weather.config.ConfigWavesMisc;
+import weather.wind.WindHandler;
+
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-
-import paulscode.sound.SoundSystem;
-import weather.WeatherEntityConfig;
-import weather.WeatherMod;
-import weather.blocks.MovingBlock;
-
-//import net.minecraft.src.mod_PathingActivated;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.Block;
-import net.minecraft.src.EffectRenderer;
-import net.minecraft.src.Entity;
-import net.minecraft.src.EntityLightningBolt;
-import net.minecraft.src.Material;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.ModLoader;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.Packet250CustomPayload;
-import net.minecraft.src.Vec3;
-import net.minecraft.src.World;
-import net.minecraft.src.WorldServer;
-import cpw.mods.fml.common.asm.SideOnly;
-import cpw.mods.fml.common.Side;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 //@SideOnly(Side.CLIENT)
-public class EntTornado extends Entity implements IEntityAdditionalSpawnData
+public class EntTornado extends Entity implements WindHandler
 {
     public WeatherEntityConfig entConf;
     public int entConfID;
@@ -107,6 +107,8 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
     //public List funnelEffects;
 
     //public World worldRef;
+    
+    public float scale = 1F;
 
     public EntTornado(World var1)
     {
@@ -120,9 +122,6 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
     {
         super(var1);
         
-        
-        
-        //THESE 3 NEED TO BE PUT INTO A DATAWATCHER!!!! (indexify WeatherEntityConfig entry?)
         entConf = config;
         entConfID = type;
         spawning = true;
@@ -170,16 +169,18 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
     public void setDead()
     {
         //if (worldObj.isRemote) return;
-    	if (WeatherMod.debug)
+    	if (ConfigWavesMisc.debug)
         {
             System.out.println("setdead, remote: " + worldObj.isRemote);
         }
 
-        if (worldObj.isRemote) WeatherMod.particleCount = 0;
+        if (worldObj.isRemote) {
+        	WeatherMod.particleCount = 0;
+        } else {
+        	WeatherMod.blockCount = 0;
+        }
         /*if (mod_EntMover.activeTornadoes > 0) */
         //WeatherMod.activeTornadoes--;
-        WeatherMod.t_SpawnTornado = false;
-        WeatherMod.t_trySpawnTornado = false;
         super.setDead();
     }
 
@@ -226,6 +227,8 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
         {
             int what = 0;
         }
+        
+        if (!ConfigTornado.Storm_Tornado_grabBlocks) return true;
 
         boolean seesLight = false;
         int blockID = this.worldObj.getBlockId(tryX, tryY, tryZ);
@@ -254,15 +257,15 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
 
                 if (notify)
                 {
-                    worldObj.setBlockWithNotify(tryX, tryY, tryZ, 0);
+                    worldObj.setBlock(tryX, tryY, tryZ, 0, 0, 3);
                 }
                 else
                 {
-                    worldObj.setBlock(tryX, tryY, tryZ, 0);
+                    worldObj.setBlock(tryX, tryY, tryZ, 0, 0, 0);
                 }
             }
 
-            if (/*mod_EntMover.getFPS() > mod_EntMover.safetyCutOffFPS && */WeatherMod.blockCount <= WeatherMod.Storm_Tornado_maxBlocks && lastGrabTime < System.currentTimeMillis() && tickGrabCount < 10)
+            if (worldObj.getChunkProvider().chunkExists((int)posX / 16, (int)posZ / 16) && /*mod_EntMover.getFPS() > mod_EntMover.safetyCutOffFPS && */WeatherMod.blockCount <= ConfigTornado.Storm_Tornado_maxBlocks && lastGrabTime < System.currentTimeMillis() && tickGrabCount < 10)
             {
                 lastGrabTime = System.currentTimeMillis() - 5;
                 //int blockMeta = this.worldObj.getBlockMetadata(tryX,tryY,tryZ);
@@ -283,6 +286,8 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
                     }
 
                     WeatherMod.blockCount++;
+                    
+                    //if (WeatherMod.debug && worldObj.getWorldTime() % 60 == 0) System.out.println("ripping, count: " + WeatherMod.blockCount);
 
                     //if (!worldObj.isRemote)
                     if (!worldObj.isRemote)
@@ -407,9 +412,9 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
 	        }
         }
 
-        if (WeatherMod.debug)
+        if (ConfigWavesMisc.debug)
         {
-            System.out.println("dissipate");
+            //System.out.println("dissipate");
         }
 
         dying = true;
@@ -466,7 +471,7 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
             }
         }
 
-        if (tryY - posY > WeatherMod.Storm_Tornado_maxYChange)
+        if (tryY - posY > ConfigTornado.Storm_Tornado_maxYChange)
         {
             //System.out.println("tornadoMaxYChange trigger - " + (tryY - posY));
             //startDissipate();
@@ -816,7 +821,11 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
         //this.setEntityDead();
         //super.onUpdate();
         //this.startDissipate();
-        if (age > getStorm().tornadoTime)
+        
+        //System.out.println("remote: " + worldObj.isRemote + " - " + entityId + " - " + age + " - " + getStorm().tornadoTime);
+        
+        //client side safety
+        if (age - (worldObj.isRemote ? 80 : 0) > getStorm().tornadoTime)
         {
             //this.trimBlocksFromWorld();
             //System.out.println("time trigger");
@@ -843,16 +852,17 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
 
         if (worldObj.isRemote)
         {
-            if (WeatherMod.Storm_Tornado_makeClouds && getStorm().type != getStorm().TYPE_SPOUT)
+            if (ConfigTornado.Storm_Tornado_makeClouds && getStorm().type != getStorm().TYPE_SPOUT)
             {
-                if (rand.nextInt(10) == 0)
+            	//System.out.println(Math.max(1, 10 - (entConfID * 2)));
+                if (rand.nextInt(Math.max(1, 10 - (entConfID * 3))) == 0)
                 {
-                    WeatherMod.spawnStorm((int)posX, (int)posY, (int)posZ);
+                    WeatherMod.spawnStorm((int)posX, (int)posY, (int)posZ, entConfID);
                 }
             }
         }
 
-        //slave dying check
+        //slave dying check, unused since changed to weather entity
         int dyingByte = this.dataWatcher.getWatchableObjectByte(10);
 
         if (dyingByte == 1)
@@ -899,7 +909,7 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
 
                 float yaw = 0;
 
-                if (WeatherMod.player != null)
+                /*if (WeatherMod.player != null)
                 {
                     double var11 = WeatherMod.player.posX - posX;
                     double var15 = WeatherMod.player.posZ - posZ;
@@ -907,7 +917,7 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
                     int size = 45;
                     yaw += rand.nextInt(size) - (size / 2);
                     realYaw = yaw;
-                }
+                }*/
 
                 setLocationAndAngles(posX, posY, posZ, yaw, 0F);
             }
@@ -916,6 +926,10 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
                 spawning = false;
                 spawnYOffset = (float)posY;
             }
+        } else {
+        	if (!worldObj.isRemote) {
+        		if (spawnYOffset > worldObj.getHeightValue((int)posX, (int)posZ)) spawnYOffset--;
+        	}
         }
 
         if (dying)
@@ -1096,7 +1110,7 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
             }
         }
 
-        if (WeatherMod.debug)
+        if (ConfigWavesMisc.debug)
         {
             WeatherMod.displayMessage(new StringBuilder().append(tryRipCount + " - " + removeCount + " - " + speedAdjust).toString());
         }
@@ -1108,8 +1122,14 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
         //for (int i = 0; i < 26; i++) {
         //}
 
+        scale = 0.08F;
+        
+        //scale = 0.15F;
+        
+        scale = 1F;
+        
         if (worldObj.isRemote) {
-	        if (WeatherMod.particleCount < WeatherMod.Storm_Tornado_maxParticles)
+	        if (WeatherMod.particleCount < ConfigTornado.Storm_Tornado_maxParticles)
 	        {
 	            float f = 2.0F;
 	            float f1 = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * f;
@@ -1148,7 +1168,7 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
 	                itCount = 4;
 	            }
 	
-	            if (WeatherMod.Storm_Tornado_oldParticles)
+	            if (ConfigTornado.Storm_Tornado_oldParticles)
 	            {
 	                itCount = 35;
 	            }
@@ -1207,14 +1227,17 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
 	                    }
 	                }
 	
+	                
+	                
 	                //HERE
-	                if (WeatherMod.Storm_Tornado_oldParticles)
+	                if (ConfigTornado.Storm_Tornado_oldParticles)
 	                {
-	                    WeatherMod.proxy.newParticle("WindFX", worldObj, this, tryX2, spawnYOffset, tryZ2, 0, 0, 0, 9.5D, colorID);
+	                    WeatherMod.proxy.newParticle("WindFX", worldObj, this, tryX2, posY, tryZ2, 0, 0, 0, 9.5D, colorID);
 	                }
 	                else
 	                {
-	                    WeatherMod.proxy.newAnimParticle("AnimTexFX", worldObj, this, tryX2, spawnYOffset, tryZ2, 0, 0, 0, 9.5D, WeatherMod.effWindAnimID, colorID);
+	                    WeatherMod.proxy.newAnimParticle("AnimTexFX", worldObj, this, tryX2, posY, tryZ2, 0, 0, 0, 9.5D, WeatherMod.effWindAnimID, colorID, scale);
+	                    //WeatherMod.proxy.newParticle("WindFX", worldObj, this, tryX2, posY, tryZ2, 0, 0, 0, 9.5D, colorID);
 	                    //derp
 	                    /*c_w_EntityRotFX var32 = null;
 	                    var32 = new c_w_EntityAnimTexFX(this.worldObj, 0, 0, 0, 0, 0, 0, 8D, WeatherMod.effWindAnimID, colorID);
@@ -1366,14 +1389,19 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
 
         //this.motionX = this.lastMotionX;
         //this.motionZ = this.lastMotionZ;
-        this.motionX = (double)(-Math.sin(rotationYaw / 180.0F * (float)Math.PI) * Math.cos(rotationPitch / 180.0F * (float)Math.PI)) * getStorm().tornadoInitialSpeed * speedAdjust;
-        this.motionZ = (double)(Math.cos(rotationYaw / 180.0F * (float)Math.PI) * Math.cos(rotationPitch / 180.0F * (float)Math.PI)) * getStorm().tornadoInitialSpeed * speedAdjust;
+        //if (scale >= 1F) {
+	        this.motionX = (double)(-Math.sin(rotationYaw / 180.0F * (float)Math.PI) * Math.cos(rotationPitch / 180.0F * (float)Math.PI)) * getStorm().tornadoInitialSpeed * speedAdjust;
+	        this.motionZ = (double)(Math.cos(rotationYaw / 180.0F * (float)Math.PI) * Math.cos(rotationPitch / 180.0F * (float)Math.PI)) * getStorm().tornadoInitialSpeed * speedAdjust;
+        //} else {
+        	/*this.motionX = 0F;
+        	this.motionZ = 0F;*/
+        //}
         //no Y movement
         rotationPitch = 0;
         rotationYaw = realYaw;
         //mod_MovePlus.displayMessage(new StringBuilder().append(motionZ + " - " + rotationPitch).toString());
         posX += motionX;
-        //posY += motionY;
+        if (!worldObj.isRemote) posY = spawnYOffset; //server only, let client use packets
         posZ += motionZ;
 
         if (!this.worldObj.isRemote)
@@ -1454,7 +1482,7 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
 	        if (syncDelay <= 0 && MinecraftServer.getServer() != null)
 	        {
 	            syncDelay = 5;
-	            ByteArrayOutputStream bos = new ByteArrayOutputStream(140);
+	            ByteArrayOutputStream bos = new ByteArrayOutputStream((Integer.SIZE * 2) + (Float.SIZE * 6));
 	            DataOutputStream dos = new DataOutputStream(bos);
 	
 	            try
@@ -1505,16 +1533,15 @@ public class EntTornado extends Entity implements IEntityAdditionalSpawnData
         this.setDead();
     }
 
-    @Override
-    public void writeSpawnData(ByteArrayDataOutput data)
-    {
-        data.writeInt(this.entConfID);
-    }
+	@Override
+	public float getWindWeight() {
+		// TODO Auto-generated method stub
+		return 999999;
+	}
 
-    @Override
-    public void readSpawnData(ByteArrayDataInput data)
-    {
-        entConfID = data.readInt();
-        entConf = (WeatherEntityConfig)WeatherMod.weatherEntTypes.get(entConfID);
-    }
+	@Override
+	public int getParticleDecayExtra() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

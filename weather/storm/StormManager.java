@@ -1,19 +1,16 @@
 package weather.storm;
 
+import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
 
 import weather.WeatherMod;
-
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.server.FMLServerHandler;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.*;
+import weather.c_CoroWeatherUtil;
+import weather.config.ConfigTornado;
+import cpw.mods.fml.relauncher.Side;
 
 public class StormManager
 {
@@ -42,11 +39,16 @@ public class StormManager
     public World world;
 
     private long lastWorldTime;
+    
+    public float smoothStrength;
 
     public StormManager(int dim)
     {
     	this();
     	dimension = dim;
+    	if (dim == 0 || dim == c_CoroWeatherUtil.tropiDimID) {
+    		maxStage = WeatherMod.weatherEntTypes.size();
+    	}
     }
     
     public StormManager()
@@ -93,10 +95,11 @@ public class StormManager
 
             if (world != null)
             {
-                if (world.getWorldInfo().isRaining())
+                if (world.getWorldInfo().isRaining() && stage >= 1)
                 {
-                    if (world.getRainStrength(1F) >= 0.3F)
-                    {
+                	//System.out.println(world.isRaining());
+                    //if (world.getRainStrength(1F) >= 0.01F)
+                    //{
                         float rStr = stage * 0.3F;
 
                         if (rStr > 1.0F)
@@ -104,16 +107,28 @@ public class StormManager
                             rStr = 1.0F;
                         }
 
-                        float tStr = stage * 0.2F;
+                        float tStr = 0.0F + (stage * 0.3F);
 
-                        if (tStr > 1.0F)
+                        if (tStr > 2.0F)
                         {
-                            tStr = 1.0F;
+                            tStr = 2.0F;
                         }
+                        
+                        if (smoothStrength < tStr) {
+                        	smoothStrength += 0.003F;
+                        	if (smoothStrength > tStr) smoothStrength = tStr;
+                        } else if (smoothStrength > tStr) {
+                        	smoothStrength -= 0.01F;
+                        	if (smoothStrength < tStr) smoothStrength = tStr;
+                        } 
 
-                        world.setRainStrength(rStr);
-                        c_CoroWeatherUtil.setThunderStr(world, tStr);
-                    }
+                        //world.setRainStrength(smoothStrength);
+                        c_CoroWeatherUtil.setThunderStr(world, smoothStrength);
+                        
+                        //System.out.println("boom");
+                    //}
+                } else {
+                	smoothStrength = 0;
                 }
             }
         }
@@ -145,20 +160,19 @@ public class StormManager
             {
                 stormIntensity = 0.0001F;
             }
+            
+            if (world.getWorldTime() % 40 == 0) {
+            	//System.out.println("stormIntensity: " + stormIntensity + " - " + "stage: " + stage + "stormDying: " + stormDying);
+            }
 
-            if (WeatherMod.tornadoItems && stormIntensity > 0.8F && stage >= 2 && !stormDying)
+            if (stormIntensity > 0.8F && stage >= 2 && !stormDying)
             {
                 WeatherMod.tryTornadoSpawn(this.dimension);
             }
-
-            if (stormIntensity < 0.4F && stage > 1)
-            {
-                WeatherMod.t_trySpawnTornado = false;
-            }
             
         } else {
-            WeatherMod.t_trySpawnTornado = false;
-            WeatherMod.t_SpawnTornado = false;
+            //WeatherMod.t_trySpawnTornado = false;
+            //WeatherMod.t_SpawnTornado = false;
         }
 
         if (stormTime < 0 && stage >= 2)
@@ -191,7 +205,7 @@ public class StormManager
 
             if (stormIntensity > 0.8F && !stormDying)
             {
-            	int chance = (int)(WeatherMod.Storm_rarityOfIncrease * (stage - 1)) + 1;
+            	int chance = (int)(ConfigTornado.Storm_rarityOfIncrease * (stage - 1)) + 1;
             	if (chance > 0) {
 	                if (world.rand.nextInt(chance) == 0)
 	                {
