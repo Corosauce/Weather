@@ -1,45 +1,42 @@
 package weather;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.src.ModLoader;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.MinecraftForge;
-import weather.blocks.MovingBlock;
-import weather.blocks.MovingBlockRenderer;
 import weather.blocks.TileEntityTSiren;
 import weather.blocks.TileEntityTSirenRenderer;
 import weather.blocks.structure.Structure;
 import weather.blocks.structure.StructureRenderer;
-import weather.renderer.EntityAnimTexFX;
-import weather.renderer.EntityFallingRainFX;
-import weather.renderer.EntitySnowFX;
-import weather.renderer.EntityWaterfallFX;
-import weather.storm.EntTornado;
-import weather.storm.EntityCloud;
-import weather.storm.EntityHail;
-import weather.storm.EntityWindFX;
-import weather.storm.RenderCloud;
-import weather.storm.RenderHail;
-import weather.storm.RenderStorm;
-import weather.storm.RenderTornado;
-import weather.storm.StormCluster;
-import weather.waves.EntitySurfboard;
-import weather.waves.RenderSurfboard;
-import weather.worldObjects.EntDrill;
-import weather.worldObjects.EntShockWave;
-import weather.worldObjects.EntWorldData;
-import weather.worldObjects.EntWorm;
-import weather.worldObjects.RenderWorm;
+import weather.client.entities.MovingBlockRenderer;
+import weather.client.entities.RenderCloud;
+import weather.client.entities.RenderHail;
+import weather.client.entities.RenderStorm;
+import weather.client.entities.RenderSurfboard;
+import weather.client.entities.RenderTornado;
+import weather.client.entities.RenderWorm;
+import weather.config.ConfigWavesMisc;
+import weather.entities.EntDrill;
+import weather.entities.EntShockWave;
+import weather.entities.EntWorldData;
+import weather.entities.EntWorm;
+import weather.entities.EntitySurfboard;
+import weather.entities.MovingBlock;
+import weather.entities.particles.EntityAnimTexFX;
+import weather.entities.particles.EntityFallingRainFX;
+import weather.entities.particles.EntitySnowFX;
+import weather.entities.particles.EntityWaterfallFX;
+import weather.entities.particles.EntityWindFX;
+import weather.entities.storm.EntTornado;
+import weather.entities.storm.EntityCloud;
+import weather.entities.storm.EntityHail;
+import weather.entities.storm.StormCluster;
+import weather.system.WeatherManager;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
@@ -57,6 +54,8 @@ public class ClientProxy extends CommonProxy
     private static String soundZipPath = "/resources/";
 
     public static Minecraft mc;
+    
+    public static final ResourceLocation resTerrain = new ResourceLocation("terrain.png");
 
     public ClientProxy()
     {
@@ -82,22 +81,11 @@ public class ClientProxy extends CommonProxy
         RenderingRegistry.registerEntityRenderingHandler(EntitySurfboard.class, new RenderSurfboard());
         RenderingRegistry.registerEntityRenderingHandler(Structure.class, new StructureRenderer());
         
+        /*System.out.println("WEATHER MOD SOUND INSTALLING TEMP OFF");
+        if (true) return;*/
+        
         // Weather sounds
-		installSound("streaming/tornado/destruction.ogg");
-		installSound("streaming/tornado/destruction_0_.ogg");
-		installSound("streaming/tornado/destruction_1_.ogg");
-		installSound("streaming/tornado/destruction_2_.ogg");
-		installSound("streaming/tornado/destruction_s.ogg");
-		installSound("streaming/tornado/destructionb.ogg");
-		installSound("streaming/tornado/siren.ogg");
-		installSound("streaming/tornado/wind_close.ogg");
-		installSound("streaming/tornado/wind_close_0_.ogg");
-		installSound("streaming/tornado/wind_close_1_.ogg");
-		installSound("streaming/tornado/wind_close_2_.ogg");
-		installSound("streaming/tornado/wind_far.ogg");
-		installSound("streaming/tornado/wind_far_0_.ogg");
-		installSound("streaming/tornado/wind_far_1_.ogg");
-		installSound("streaming/tornado/wind_far_2_.ogg");
+		
 		/*installSound("streaming/waterfall.ogg");
 		installSound("sound/waterfall.ogg");*/
 		
@@ -110,49 +98,12 @@ public class ClientProxy extends CommonProxy
     public void postInit(WeatherMod pMod)
     {
     	super.postInit(pMod);
-    	EntityRendererProxyWeatherMini temp = new EntityRendererProxyWeatherMini(mc);
-        temp.rainRate = 50; //useless (?)
-        mc.entityRenderer = temp;
+    	if (ConfigWavesMisc.proxyRenderOverrideEnabled) {
+	    	EntityRendererProxyWeatherMini temp = new EntityRendererProxyWeatherMini(mc);
+	        temp.rainRate = 50; //useless (?)
+	        mc.entityRenderer = temp;
+    	}
     }
-    
-    private void installSound(String filename) {
-		File soundFile = new File(ModLoader.getMinecraftInstance().mcDataDir,
-				"resources/" + filename);
-
-		if (!soundFile.exists()) {
-			// Copy sound file from zip file to proper path
-			try {
-				String srcPath = soundZipPath + filename;
-				InputStream inStream = WeatherMod.class.getResourceAsStream(srcPath);
-				if (inStream == null) {
-					throw new IOException();
-				}
-
-				if (!soundFile.getParentFile().exists()) {
-					soundFile.getParentFile().mkdirs();
-				}
-
-				BufferedInputStream fileIn = new BufferedInputStream(inStream);
-				BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(soundFile));
-				byte[] buffer = new byte[1024];
-				int n = 0;
-				while (-1 != (n = fileIn.read(buffer))) {
-					fileOut.write(buffer, 0, n);
-				}
-				fileIn.close();
-				fileOut.close();
-
-			} catch (IOException ex) {
-			}
-
-		}
-
-		if (soundFile.canRead() && soundFile.isFile()) {
-			ModLoader.getMinecraftInstance().installResource(filename, soundFile);
-		} else {
-			System.err.println("Could not load file: " + soundFile);
-		}
-	}
 
     @Override
     public int getUniqueTextureLoc()
@@ -200,7 +151,7 @@ public class ClientProxy extends CommonProxy
         rr.registerEntityRenderingHandler(MovingBlock.class, new MovingBlockRenderer());
         
         //Entities in the loaded mc world / weather effects that need fake blank renderers
-        rr.registerEntityRenderingHandler(EntWorldData.class, new RenderStorm());
+        //rr.registerEntityRenderingHandler(EntWorldData.class, new RenderStorm());
         rr.registerEntityRenderingHandler(StormCluster.class, new RenderStorm());
         rr.registerEntityRenderingHandler(EntityTexFX.class, new RenderStorm());
         rr.registerEntityRenderingHandler(EntityTexBiomeColorFX.class, new RenderStorm());
@@ -253,7 +204,7 @@ public class ClientProxy extends CommonProxy
         var31.noClip = true;
         var31.setSize(1.25F, 1.25F);
         var31.setPosition(posX, posY, posZ);
-        c_CoroWeatherUtil.setParticleScale(var31, c_CoroWeatherUtil.getParticleScale(var31) * scale);
+        WeatherUtil.setParticleScale(var31, WeatherUtil.getParticleScale(var31) * scale);
         //var31.particleScale *= scale;
         //var31 = new c_w_EntityWindFX(worldRef, posX, posY, posZ, velX, velY, velZ, maxAge, colorID);
         //var31 = new c_w_EntityAnimTexFX(this.worldObj, d + (double)f8 * d4, d1 + (double)f9 * d4, d2 + (double)f10 * d4, d6 / 2D, d7 / 2D, d8 / 2D, 8D, WeatherMod.effWindAnimID, colorID);

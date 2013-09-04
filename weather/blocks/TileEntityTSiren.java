@@ -5,9 +5,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.src.ModLoader;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
-
 import weather.WeatherMod;
-import weather.storm.EntTornado;
+import weather.entities.storm.EntTornado;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -42,7 +41,7 @@ public class TileEntityTSiren extends TileEntity
                 if (WeatherMod.activeTornado.getDistance(xCoord, yCoord, zCoord) < 180)
                 {
                     this.lastPlayTime = System.currentTimeMillis() + 13000L;
-                    this.soundID = WeatherMod.playMovingSound("tornado.siren", (float)ModLoader.getMinecraftInstance().thePlayer.posX, (float)ModLoader.getMinecraftInstance().thePlayer.posY, (float)ModLoader.getMinecraftInstance().thePlayer.posZ, 1.0F, 1.0F);
+                    this.soundID = WeatherMod.playMovingSound(WeatherMod.modID + ":tornado.siren", (float)ModLoader.getMinecraftInstance().thePlayer.posX, (float)ModLoader.getMinecraftInstance().thePlayer.posY, (float)ModLoader.getMinecraftInstance().thePlayer.posZ, 1.0F, 1.0F);
                 }
             }
         }

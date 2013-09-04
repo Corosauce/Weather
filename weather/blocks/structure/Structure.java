@@ -1,14 +1,13 @@
 package weather.blocks.structure;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-
-import java.util.LinkedList;
-import java.util.List;
-
 import weather.WeatherMod;
 import CoroAI.PathEntityEx;
 import CoroAI.entity.EnumActState;
@@ -401,17 +400,6 @@ public class Structure extends EntityLiving
 	public boolean hasPath() {
 		// TODO Auto-generated method stub
 		return pathEntity != null && !pathEntity.isFinished();
-	}
-
-	public int getHealth() {
-		// TODO Auto-generated method stub
-		return this.health;
-	}
-
-	@Override
-	public int getMaxHealth() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	public boolean isEnemy(Entity entity1) {

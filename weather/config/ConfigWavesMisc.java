@@ -3,11 +3,7 @@ package weather.config;
 import java.io.File;
 
 import modconfig.IConfigCategory;
-
-
-
-
-import weather.c_CoroWeatherUtil;
+import weather.WeatherUtil;
 
 
 public class ConfigWavesMisc implements IConfigCategory {
@@ -17,10 +13,11 @@ public class ConfigWavesMisc implements IConfigCategory {
 	public static boolean demoItems = true;
 	public static boolean weatherItems = true;
 	public static boolean debug = false;
+	public static boolean proxyRenderOverrideEnabled = true;
 
 	public ConfigWavesMisc() {
-		if (c_CoroWeatherUtil.hasTropicraft()) {
-			waveRenderRange = 0;
+		if (WeatherUtil.hasTropicraft()) {
+			//waveRenderRange = 0;
 		} else {
 			
 		}

@@ -1,14 +1,13 @@
 package weather.blocks;
 
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-import java.util.Random;
-
 import weather.WeatherMod;
-import weather.storm.EntTornado;
+import weather.entities.storm.EntTornado;
 
 public class BlockTSensor extends Block
 {

@@ -1,25 +1,24 @@
 package weather;
 
+import java.util.Random;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.src.EntityRendererProxy;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
-
-import java.util.Random;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
-import extendedrenderer.particle.entity.EntityRotFX;
-
+import cpw.mods.fml.client.FMLClientHandler;
 
 import weather.config.ConfigTornado;
-import weather.renderer.EntityFallingRainFX;
+import weather.entities.particles.EntityFallingRainFX;
+import extendedrenderer.particle.entity.EntityRotFX;
 
 public class EntityRendererProxyWeatherMini extends EntityRendererProxy
 {
@@ -38,6 +37,9 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
 
     /** Rain Y coords */
     public float[] rainYCoords;
+    
+    private static final ResourceLocation resRain = new ResourceLocation("textures/environment/rain.png");
+    private static final ResourceLocation resSnow = new ResourceLocation("textures/environment/snow.png");
 
     public EntityRendererProxyWeatherMini(Minecraft var1)
     {
@@ -68,6 +70,11 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
     	super.setupFog(par1, par2);
     	System.out.println("woooooo");
     }*/
+    
+    public boolean isPaused() {
+    	if (FMLClientHandler.instance().getClient().getIntegratedServer() != null && FMLClientHandler.instance().getClient().getIntegratedServer().getServerListeningThread() != null && FMLClientHandler.instance().getClient().getIntegratedServer().getServerListeningThread().isGamePaused()) return true;
+    	return false;
+    }
 
     @Override
     protected void renderRainSnow(float par1)
@@ -124,7 +131,7 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
                 }
             }
 
-            EntityLiving var41 = this.mc.renderViewEntity;
+            EntityLivingBase var41 = this.mc.renderViewEntity;
             World var42 = this.mc.theWorld;
             
             int var43 = MathHelper.floor_double(var41.posX);
@@ -136,7 +143,8 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.01F);
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/environment/snow.png"));
+            this.mc.func_110434_K().func_110577_a(resRain);
+            //GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/environment/snow.png"));
             double var9 = var41.lastTickPosX + (var41.posX - var41.lastTickPosX) * (double)par1;
             double var11 = var41.lastTickPosY + (var41.posY - var41.lastTickPosY) * (double)par1;
             double var13 = var41.lastTickPosZ + (var41.posZ - var41.lastTickPosZ) * (double)par1;
@@ -199,7 +207,7 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
                             {
                                 if (ConfigTornado.smoothRain)
                                 {
-                                    if (!mc.isGamePaused && mc.theWorld != null && mc.theWorld.getWorldInfo().getWorldTime() != lastWorldTime)
+                                    if (!isPaused() && mc.theWorld != null && mc.theWorld.getWorldInfo().getWorldTime() != lastWorldTime)
                                     {
                                     	int rr = 50 - (rainRate * 4);
                                     	if (rr < 1) { rr = 1; }
@@ -240,7 +248,8 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
                                     }
 
                                     var18 = 1;
-                                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/environment/snow.png"));
+                                    this.mc.func_110434_K().func_110577_a(resSnow);
+                                    //GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/environment/snow.png"));
                                     var8.startDrawingQuads();
                                 }
 

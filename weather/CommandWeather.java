@@ -1,21 +1,10 @@
 package weather;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import CoroAI.PFQueue;
-import CoroAI.c_CoroAIUtil;
-
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraft.util.ChatMessageComponent;
 
 public class CommandWeather extends CommandBase {
 
@@ -25,13 +14,18 @@ public class CommandWeather extends CommandBase {
 	}
 
 	@Override
+	public String getCommandUsage(ICommandSender icommandsender) {
+		return "";
+	}
+
+	@Override
 	public void processCommand(ICommandSender var1, String[] var2) {
 		
 		try {
 			if (var2.length < 2)
 	        {
 				//exception throws dont seem to always get sent to player, do it manually
-				var1.sendChatToPlayer("Invalid usage, example: '/wm spawn tornado");
+				var1.sendChatToPlayer(ChatMessageComponent.func_111077_e("Invalid usage, example: '/wm spawn tornado"));
 	            throw new WrongUsageException("Invalid usage");
 	        }
 	        else
@@ -44,11 +38,11 @@ public class CommandWeather extends CommandBase {
 	        				type = Integer.valueOf(var2[2]);
 	        			}
 	        			if (type > 5) {
-	        				var1.sendChatToPlayer("use type 5 or less");
+	        				var1.sendChatToPlayer(ChatMessageComponent.func_111077_e("use type 5 or less"));
 	        			}
 	        			EntityPlayer entP = (EntityPlayer)var1;
 	        			WeatherMod.tryTornadoSpawn(entP.dimension, true, entP.username, type);
-	        			var1.sendChatToPlayer("Spawning tornado type: " + type);
+	        			var1.sendChatToPlayer(ChatMessageComponent.func_111077_e("Spawning tornado type: " + type));
 	        		}
 	        	}
 	        	

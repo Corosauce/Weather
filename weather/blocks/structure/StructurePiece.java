@@ -1,12 +1,11 @@
 package weather.blocks.structure;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
-
 import java.util.LinkedList;
 import java.util.List;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 import weather.WeatherMod;
 
 public class StructurePiece extends Entity

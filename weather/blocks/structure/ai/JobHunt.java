@@ -1,11 +1,10 @@
 package weather.blocks.structure.ai;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.util.DamageSource;
-
 import java.util.List;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.DamageSource;
 import CoroAI.PFQueue;
 import CoroAI.entity.EnumJobState;
 import CoroAI.entity.JobManager;
@@ -81,7 +80,7 @@ public class JobHunt extends JobBaseStructure {
 		} else {*/
 			setJobState(EnumJobState.IDLE);
 			
-			if (ent.getHealth() > ent.getMaxHealth() * 0.90F && (ent.entityToAttack == null || ent.worldObj.rand.nextInt(20) == 0)) {
+			if (ent.func_110143_aJ() > ent.func_110138_aP() * 0.90F && (ent.entityToAttack == null || ent.worldObj.rand.nextInt(20) == 0)) {
 				boolean found = false;
 				Entity clEnt = null;
 				float closest = 9999F;
@@ -91,7 +90,7 @@ public class JobHunt extends JobBaseStructure {
 		            Entity entity1 = (Entity)list.get(j);
 		            if(ent.isEnemy(entity1))
 		            {
-		            	if (xRay || ((EntityLiving) entity1).canEntityBeSeen(ent)) {
+		            	if (xRay || ((EntityLivingBase) entity1).canEntityBeSeen(ent)) {
 		            		if (sanityCheck(entity1)/* && entity1 instanceof EntityPlayer*/) {
 		            			float dist = ent.getDistanceToEntity(entity1);
 		            			if (dist < closest) {
@@ -129,7 +128,7 @@ public class JobHunt extends JobBaseStructure {
 			}*/
 			
 		//}
-		ent.prevHealth = ent.getHealth();
+		ent.prevHealth = ent.func_110143_aJ();
 	}
 	
 	
@@ -147,7 +146,7 @@ public class JobHunt extends JobBaseStructure {
 	}
 	
 	public boolean sanityCheckHelp(Entity caller, Entity target) {
-		if (ent.getHealth() < 10) {
+		if (ent.func_110143_aJ() < 10) {
 			return false;
 		}
 		
@@ -163,7 +162,7 @@ public class JobHunt extends JobBaseStructure {
 	}
 	
 	public boolean sanityCheck(Entity target) {
-		if (ent.getHealth() < 10) {
+		if (ent.func_110143_aJ() < 10) {
 			return false;
 		}
 		

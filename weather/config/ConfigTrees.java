@@ -2,14 +2,8 @@ package weather.config;
 
 import java.io.File;
 
-import net.minecraft.block.Block;
-
 import modconfig.IConfigCategory;
-
-
-
-
-import weather.c_CoroWeatherUtil;
+import net.minecraft.block.Block;
 
 
 public class ConfigTrees implements IConfigCategory {

@@ -3,7 +3,6 @@ package weather.blocks.structure.ai;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
-
 import weather.blocks.structure.Structure;
 import CoroAI.entity.EnumJobState;
 import CoroAI.entity.JobManager;

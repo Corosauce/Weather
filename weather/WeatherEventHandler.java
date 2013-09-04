@@ -2,10 +2,14 @@ package weather;
 
 import java.util.List;
 
+import CoroAI.util.CoroUtilFile;
+
 import net.minecraft.entity.Entity;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.world.ChunkEvent.Unload;
-import weather.blocks.MovingBlock;
+import net.minecraftforge.event.world.WorldEvent.Load;
+import net.minecraftforge.event.world.WorldEvent.Save;
+import weather.entities.MovingBlock;
 
 public class WeatherEventHandler {
 	
@@ -27,5 +31,15 @@ public class WeatherEventHandler {
             }
 		}
 		//System.out.println("Chunk unloaded, WeatherMod.blockCount: " + WeatherMod.blockCount);
+	}
+	
+	@ForgeSubscribe
+	public void worldSave(Save saveEvent) {
+		CoroUtilFile.setExtraWorldNBT("WeatherNBT.dat", ServerTickHandler.worldNBT);
+	}
+	
+	@ForgeSubscribe
+	public void worldLoad(Load loadEvent) {
+		ServerTickHandler.worldNBT = CoroUtilFile.getExtraWorldNBT("WeatherNBT.dat");
 	}
 }

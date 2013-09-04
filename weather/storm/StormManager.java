@@ -1,14 +1,13 @@
 package weather.storm;
 
-import net.minecraft.network.packet.Packet250CustomPayload;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 
+import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
 import weather.WeatherMod;
-import weather.c_CoroWeatherUtil;
+import weather.WeatherUtil;
 import weather.config.ConfigTornado;
 import cpw.mods.fml.relauncher.Side;
 
@@ -24,7 +23,7 @@ public class StormManager
     public boolean stormDeathStage = false;
 
     public int stormTime = 0;
-    public int stormStartTime = 0;
+    public int stormTimeLength = 0;
     public float stormStrength = 0F;
     public float stormIntensity = 0F;
     public boolean stormActive = false;
@@ -46,7 +45,7 @@ public class StormManager
     {
     	this();
     	dimension = dim;
-    	if (dim == 0 || dim == c_CoroWeatherUtil.tropiDimID) {
+    	if (dim == 0 || dim == WeatherUtil.tropiDimID) {
     		maxStage = WeatherMod.weatherEntTypes.size();
     	}
     }
@@ -123,7 +122,7 @@ public class StormManager
                         } 
 
                         //world.setRainStrength(smoothStrength);
-                        c_CoroWeatherUtil.setThunderStr(world, smoothStrength);
+                        WeatherUtil.setThunderStr(world, smoothStrength);
                         
                         //System.out.println("boom");
                     //}
@@ -147,11 +146,11 @@ public class StormManager
         {
             if (stormStrength < 0.5F)
             {
-                stormStrength = c_CoroWeatherUtil.getThunderStr(world) + 0.25F;
+                stormStrength = WeatherUtil.getThunderStr(world) + 0.25F;
             }
             else
             {
-                stormStrength = 0.5F + (0.5F * stormTime / stormStartTime);
+                stormStrength = 0.5F + (0.5F * stormTime / stormTimeLength);
             }
 
             stormIntensity = (0.25F - Math.abs(stormStrength - 0.75F)) / 0.25F;
@@ -214,7 +213,7 @@ public class StormManager
             	}
             }
 
-            if (!stormDying && stormIntensity < 0.8F && stormTime < stormStartTime / 2)
+            if (!stormDying && stormIntensity < 0.8F && stormTime < stormTimeLength / 2)
             {
                 stormDying = true;
             }
@@ -299,7 +298,7 @@ public class StormManager
             world.getWorldInfo().setThundering(true);
             world.getWorldInfo().setRaining(true);
             stormTime = newTime;
-            stormStartTime = newTime;
+            stormTimeLength = newTime;
             world.getWorldInfo().setRainTime(newTime);
             world.getWorldInfo().setThunderTime(newTime);
         }
@@ -316,7 +315,7 @@ public class StormManager
         setStage(stage + 1);
         int newTime = world.rand.nextInt(12000) + 3600;
         stormTime = newTime;
-        stormStartTime = newTime;
+        stormTimeLength = newTime;
 
         if (stage > 1)
         {

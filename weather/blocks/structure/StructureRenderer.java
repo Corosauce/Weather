@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
@@ -26,8 +27,6 @@ public class StructureRenderer extends Render
         GL11.glPushMatrix();
         GL11.glTranslatef((float)var2, (float)var4, (float)var6);
         GL11.glScalef(var1.sizeScale, var1.sizeScale, var1.sizeScale);
-        this.loadTexture("/terrain.png");
-        this.loadTexture("/tropicalmod/tropiterrain.png");
         
         //
         
@@ -176,4 +175,9 @@ public class StructureRenderer extends Render
     {
         this.a((Structure)var1, var2, var4, var6, var8, var9);
     }
+
+	@Override
+	protected ResourceLocation func_110775_a(Entity entity) {
+		return new ResourceLocation("/terrain.png");
+	}
 }

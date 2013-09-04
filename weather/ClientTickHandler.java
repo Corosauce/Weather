@@ -1,18 +1,18 @@
 package weather;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.EnumSet;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.EnumSet;
-
 import org.lwjgl.input.Keyboard;
 
+import weather.client.gui.GuiWeatherCP;
 import weather.config.ConfigWavesMisc;
-import weather.worldObjects.GuiWeatherCP;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
@@ -104,6 +104,11 @@ public class ClientTickHandler implements ITickHandler
 
     Field curPlayingStr = null;
 
+    public boolean isPaused() {
+    	if (FMLClientHandler.instance().getClient().getIntegratedServer() != null && FMLClientHandler.instance().getClient().getIntegratedServer().getServerListeningThread() != null && FMLClientHandler.instance().getClient().getIntegratedServer().getServerListeningThread().isGamePaused()) return true;
+    	return false;
+    }
+    
     public void onTickInGame()
     {
         /*if (curPlayingStr == null) {
@@ -126,11 +131,10 @@ public class ClientTickHandler implements ITickHandler
         } catch (Exception exxx) {
         	exxx.printStackTrace();
         }*/
-    	
     	WeatherMod.instance.mc = FMLClientHandler.instance().getClient();
         World world = WeatherMod.instance.mc.theWorld;
 
-        if (world != null && !FMLClientHandler.instance().getClient().isGamePaused)
+        if (world != null && !isPaused())
         {
             WeatherMod.weather(Side.CLIENT, world);
             WeatherMod.weatherMan.tick(Side.CLIENT, world);

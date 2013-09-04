@@ -1,9 +1,8 @@
 package weather.blocks.structure;
 
-import net.minecraft.world.World;
-
 import java.util.EnumSet;
 
+import net.minecraft.world.World;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;

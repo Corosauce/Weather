@@ -1,5 +1,7 @@
 package weather.blocks.structure;
 
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -13,12 +15,9 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-
-import java.util.List;
-
 import weather.WeatherMod;
 import weather.config.ConfigTornado;
-import weather.wind.WindHandler;
+import weather.system.wind.WindHandler;
 import CoroAI.PFQueue;
 import CoroAI.PathEntityEx;
 import CoroAI.c_IEnhPF;
@@ -233,7 +232,7 @@ public class PhantomBlock extends Entity implements IEntityAdditionalSpawnData, 
             }*/
             Vec3 var1 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
             Vec3 var2 = Vec3.createVectorHelper(this.posX + this.motionX * 1.3D, this.posY + this.motionY * 1.3D, this.posZ + this.motionZ * 1.3D);
-            MovingObjectPosition var3 = this.worldObj.rayTraceBlocks(var1, var2);
+            MovingObjectPosition var3 = this.worldObj.clip(var1, var2);
             var2 = Vec3.createVectorHelper(this.posX + this.motionX * 1.3D, this.posY + this.motionY * 1.3D, this.posZ + this.motionZ * 1.3D);
 
             if (var3 != null)

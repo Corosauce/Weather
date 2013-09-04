@@ -3,10 +3,6 @@ package weather.config;
 import java.io.File;
 
 import modconfig.IConfigCategory;
-
-
-
-
 import weather.WeatherMod;
 
 public class ConfigIDs implements IConfigCategory {

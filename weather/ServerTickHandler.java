@@ -1,15 +1,15 @@
 package weather;
 
-import net.minecraft.command.ServerCommandManager;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
-
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 
+import net.minecraft.command.ServerCommandManager;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import weather.storm.StormManager;
-import weather.waves.CommandWaveHeight;
+import weather.system.WeatherManager;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
@@ -33,6 +33,8 @@ public class ServerTickHandler implements ITickHandler
     
 	private World lastWorld;
     
+	public static NBTTagCompound worldNBT = new NBTTagCompound(); 
+	
     public ServerTickHandler() {
     	
     	wMans = new ArrayList();
@@ -42,8 +44,8 @@ public class ServerTickHandler implements ITickHandler
     	
     	addWorldToWeather(0);
     	
-    	if (c_CoroWeatherUtil.hasTropicraft()) {
-    		addWorldToWeather(c_CoroWeatherUtil.tropiDimID);
+    	if (WeatherUtil.hasTropicraft()) {
+    		addWorldToWeather(WeatherUtil.tropiDimID);
     	}
     	
     	//sMans.g

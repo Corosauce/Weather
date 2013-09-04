@@ -7,11 +7,10 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
-
-import weather.blocks.MovingBlock;
 
 public class PhantomBlockRenderer extends Render
 {
@@ -23,11 +22,16 @@ public class PhantomBlockRenderer extends Render
         this.a = new RenderBlocks();
     }
 
+	@Override
+	protected ResourceLocation func_110775_a(Entity entity) {
+		return new ResourceLocation("/terrain.png");
+	}
+
     public void a(PhantomBlock var1, double var2, double var4, double var6, float var8, float var9)
     {
         GL11.glPushMatrix();
         GL11.glTranslatef((float)var2, (float)var4, (float)var6);
-        this.loadTexture("/terrain.png");
+        //this.loadTexture("/terrain.png");
         Block var10 = Block.blocksList[var1.tile];
         World var11 = var1.worldObj;
         GL11.glDisable(GL11.GL_LIGHTING);

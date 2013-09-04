@@ -5,7 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import weather.blocks.TileEntityTSiren;
 import weather.blocks.structure.tree.TileEntityVectorTree;
-import weather.storm.EntTornado;
+import weather.entities.storm.EntTornado;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
