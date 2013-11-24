@@ -26,6 +26,10 @@ public class WaveRenderer
     public float red = 1F;
     public float green = 1F;
     public float blue = 1F;
+    
+    public static float renderXlast;
+    public static float renderYlast;
+    public static float renderZlast;
 
     public WaveRenderer()
     {
@@ -51,12 +55,21 @@ public class WaveRenderer
     public void vboRender(Block block, float var2, float height, float ampheight, float magnitude, float angle, float waveTime, int xx, int zz, float var3, float var4, float var5, float var6, float var7)
     {
         int dim = ModLoader.getMinecraftInstance().thePlayer.dimension;
+        double playerY = ModLoader.getMinecraftInstance().thePlayer.posY;
         Tessellator var1 = Tessellator.instance;
         Icon icon = getParticleTextureIndex(dim, block);
         float var12 = 0.5F;
         float var13 = renderX - (float)EntityFX.interpPosX;
         float var14 = renderY - (float)EntityFX.interpPosY;
         float var15 = renderZ - (float)EntityFX.interpPosZ;
+        
+        //var14 = renderY - (renderYlast + ((float)playerY - renderYlast) * var2);
+        
+        //float var13 = renderX - (float)EntityFX.interpPosX;
+        //var14 = (renderY - (float)playerY) - (renderYlast - renderY) * var2;
+        //float var15 = renderZ - (float)EntityFX.interpPosZ;
+        
+        //System.out.println(var14);
         
         double distToCamera = Math.sqrt(var13 * var13 + var14 * var14 + var15 * var15);
         double distAlpha = 1D - ((distToCamera / ConfigWavesMisc.waveRenderRange) * 2D);

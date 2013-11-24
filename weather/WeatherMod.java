@@ -294,14 +294,16 @@ public class WeatherMod implements Runnable
     {
         blockIDToUseMapping.clear();
         //System.out.println("Blacklist: ");
-        String[] splEnts = ConfigTornado.Storm_Tornado_blockList.split(",");
+        String[] splEnts = ConfigTornado.Storm_Tornado_GrabList.split(",");
         int[] blocks = new int[splEnts.length];
 
-        for (int i = 0; i < splEnts.length; i++)
-        {
-            splEnts[i] = splEnts[i].trim();
-            blocks[i] = Integer.valueOf(splEnts[i]);
-            //System.out.println(splEnts[i]);
+        if (splEnts.length > 1) {
+	        for (int i = 0; i < splEnts.length; i++)
+	        {
+	            splEnts[i] = splEnts[i].trim();
+	            blocks[i] = Integer.valueOf(splEnts[i]);
+	            //System.out.println(splEnts[i]);
+	        }
         }
 
         //HashMap hashmap = null;
@@ -494,7 +496,7 @@ public class WeatherMod implements Runnable
 
             try
             {
-                field = (SoundManager.class).getDeclaredField("e");
+                field = (SoundManager.class).getDeclaredField("field_77378_e");
                 field.setAccessible(true);
                 //int j = (int)(field.getFloat(item) * (petHealFactor * (float)((EntityCreature)entityliving1).enhanced));
                 lastSoundID = field.getInt(sndSystem);
@@ -527,7 +529,7 @@ public class WeatherMod implements Runnable
 
         try
         {
-            field = (EffectRenderer.class).getDeclaredField(ObfuscationReflectionHelper.remapFieldNames("net.minecraft.client.particle.EffectRenderer", new String[] { "field_78876_b" })[0]);
+            field = (EffectRenderer.class).getDeclaredField("field_78876_b");//ObfuscationReflectionHelper.remapFieldNames("net.minecraft.client.particle.EffectRenderer", new String[] { "fxLayers" })[0]);
             field.setAccessible(true);
             fxLayers = (List[])field.get(ModLoader.getMinecraftInstance().effectRenderer);
         }
@@ -594,11 +596,7 @@ public class WeatherMod implements Runnable
     @SideOnly(Side.CLIENT)
     public static int playMovingSound(String var1, float var2, float var3, float var4, float var5, float var6)
     {
-        //SoundManager sndMgr = ModLoader.getMinecraftInstance().sndManager;
-        if (sndSystem == null)
-        {
-            getSoundSystem();
-        }
+        getSoundSystem();
 
         if (sndSystem != null)
         {
@@ -617,7 +615,7 @@ public class WeatherMod implements Runnable
                         var9 *= var5;
                     }
 
-                    sndSystem.backgroundMusic(snd, var7.func_110457_b(), var7.func_110458_a(), false);
+                    sndSystem.backgroundMusic(snd, var7.getSoundUrl(), var7.getSoundName(), false);
                     sndSystem.setVolume(snd, var5 * ModLoader.getMinecraftInstance().gameSettings.soundVolume);
                     sndSystem.play(snd);
                 }
@@ -811,13 +809,10 @@ public class WeatherMod implements Runnable
             ModLoader.addName(itemSurfboard, "Surfboard");
             EntityRegistry.registerModEntity(EntitySurfboard.class, "EntitySurfboard", entIDs++, this, 250, 5, true);
             
-            ModLoader.addRecipe(new ItemStack(blockSiren, 1), new Object[] {"X X", "DID", "X X", 'D', Item.redstone, 'I', Item.ingotGold, 'X', Item.ingotIron, 'D', Item.redstone});
-            ModLoader.addRecipe(new ItemStack(blockTSensor, 1), new Object[] {"XDX", "DID", "XDX", 'D', Item.redstone, 'I', Item.ingotGold, 'X', Item.ingotIron, 'D', Item.redstone});
+            ModLoader.addRecipe(new ItemStack(blockTSensor, 1), new Object[] {"X X", "DID", "X X", 'D', Item.redstone, 'I', Item.ingotGold, 'X', Item.ingotIron});
+            ModLoader.addRecipe(new ItemStack(blockSiren, 1), new Object[] {"XDX", "DID", "XDX", 'D', Item.redstone, 'I', blockTSensor, 'X', Item.ingotIron});
             ModLoader.addRecipe(new ItemStack(itemSurfboard, 1), new Object[] {"   ", "DDD", "  X", 'D', Block.planks, 'X', Item.stick});
         }
-        
-        
-        
         
         if (ConfigWavesMisc.demoItems)
         {
@@ -850,7 +845,7 @@ public class WeatherMod implements Runnable
             //ModLoader.registerEntityID(c_w_MovingBlock.class, "MovingBlock", ModLoader.getUniqueEntityId());
             //ModLoader.registerEntityID(c_w_EntShockWave.class, "EntShockWave", entIDs++);
             //ModLoader.registerEntityID(c_w_EntDrill.class, "EntDrill", entIDs++);
-            ModLoader.addRecipe(new ItemStack(itemTornado, 1), new Object[]
+            /*ModLoader.addRecipe(new ItemStack(itemTornado, 1), new Object[]
                     {
                         " D ", " I ", " D ", 'D', Item.silk, 'I', Item.stick
                     });
@@ -865,7 +860,7 @@ public class WeatherMod implements Runnable
             ModLoader.addRecipe(new ItemStack(itemDrill, 1), new Object[]
                     {
                         " I ", "III", " I ", 'I', Item.stick
-                    });
+                    });*/
         }
 
         //effWindAnimID[0] = ModLoader.addOverride("/gui/items.png", "/item/smoke/sharp1.png");
@@ -938,7 +933,8 @@ public class WeatherMod implements Runnable
     {
         try
         {
-            if (ConfigTornado.Storm_Tornado_blockStrengthGrabbing)
+        	boolean result = true;
+            if (ConfigTornado.Storm_Tornado_GrabCond_StrengthGrabbing)
             {
                 float strMin = 0.0F;
                 float strMax = 0.74F;
@@ -946,36 +942,46 @@ public class WeatherMod implements Runnable
 
                 if (block == null)
                 {
-                    return false;
+                	result = false;
+                	return result; //force return false to prevent unchecked future code outside scope
+                } else {
+
+	                float strVsBlock = block.getBlockHardness(parWorld, 0, 0, 0) - (((itemStr.getStrVsBlock(block) - 1) / 4F));
+	
+	                //System.out.println(strVsBlock);
+	                if (/*block.getHardness() <= 10000.6*/ (strVsBlock <= strMax && strVsBlock >= strMin) || block.blockMaterial == Material.wood || block.blockMaterial == Material.cloth)
+	                {
+	                    /*if (block.blockMaterial == Material.water) {
+	                    	return false;
+	                    }*/
+	                    if (!safetyCheck(block.blockID))
+	                    {
+	                    	result = false;
+	                    }
+	                } else {
+	                	result = false;
+	                }
+	
+	                
                 }
-
-                float strVsBlock = block.getBlockHardness(parWorld, 0, 0, 0) - (((itemStr.getStrVsBlock(block) - 1) / 4F));
-
-                //System.out.println(strVsBlock);
-                if (/*block.getHardness() <= 10000.6*/ (strVsBlock <= strMax && strVsBlock >= strMin) || block.blockMaterial == Material.wood || block.blockMaterial == Material.cloth)
-                {
-                    /*if (block.blockMaterial == Material.water) {
-                    	return false;
-                    }*/
-                    if (safetyCheck(block.blockID))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
             }
-            else
+            
+            if (ConfigTornado.Storm_Tornado_GrabCond_List)
             {
-                if (!ConfigTornado.Storm_Tornado_blockBlacklistMode)
+                if (!ConfigTornado.Storm_Tornado_GrabListBlacklistMode)
                 {
-                    return ((Boolean)blockIDToUseMapping.get(id)).booleanValue();
+                    if (!((Boolean)blockIDToUseMapping.get(id)).booleanValue()) {
+                    	result = false;
+                    }
                 }
                 else
                 {
-                    return !((Boolean)blockIDToUseMapping.get(id)).booleanValue();
+                    if (((Boolean)blockIDToUseMapping.get(id)).booleanValue()) {
+                    	result = false;
+                    }
                 }
             }
+            return result;
         }
         catch (Exception ex)
         {
@@ -2441,7 +2447,7 @@ public class WeatherMod implements Runnable
         	if (id > 0 && Block.blocksList[id].blockMaterial == Material.wood) {
         		float var5 = 0;
 
-        		var5 = (Float)WeatherUtil.getPrivateValueBoth(PlayerControllerMP.class, (PlayerControllerMP)ModLoader.getMinecraftInstance().playerController, c_CoroAIUtil.refl_curBlockDamageMP_obf, c_CoroAIUtil.refl_curBlockDamageMP_mcp);
+        		var5 = (Float)c_CoroAIUtil.getPrivateValueSRGMCP(PlayerControllerMP.class, (PlayerControllerMP)ModLoader.getMinecraftInstance().playerController, c_CoroAIUtil.refl_curBlockDamageMP_obf, c_CoroAIUtil.refl_curBlockDamageMP_mcp);
 
                 if (var5 > 0) {
                 	shakeTrees(8);
@@ -2637,7 +2643,7 @@ public class WeatherMod implements Runnable
                             	if (/*true || */worldRef.rand.nextInt(Math.max(1, (uh / 100))) == 0) {
                             		double speed = 0.15D;
                             		//System.out.println("xx:" + xx);
-                                	EntityRotFX entityfx = pm.spawnNewParticle(worldRef, ParticleRegistry.smoke, xx + rand.nextDouble(), yy + 0.2D + rand.nextDouble() * 0.2D, zz + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D, (rand.nextDouble() - rand.nextDouble()) * speed);
+                                	EntityRotFX entityfx = pm.spawnNewParticleWindFX(worldRef, ParticleRegistry.smoke, xx + rand.nextDouble(), yy + 0.2D + rand.nextDouble() * 0.2D, zz + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D, (rand.nextDouble() - rand.nextDouble()) * speed);
                                 	pm.setParticleRandoms(entityfx, true, true);
                                 	pm.setParticleFire(entityfx);
                                 	entityfx.setMaxAge(100+rand.nextInt(300));
@@ -3274,6 +3280,8 @@ public class WeatherMod implements Runnable
         //wr.setRenderManager(RenderManager.instance);
         Entity player = mc.thePlayer;
 
+        //player.motionY -= 0.5F;
+        
         if (true)
         {
             float time = ModLoader.getMinecraftInstance().theWorld.getWorldTime();
@@ -3308,11 +3316,11 @@ public class WeatherMod implements Runnable
                 int var9 = 0;//mod_ExtendedRenderer.rotEffRenderer.renderer.getTexture("/terrain.png");
                 
                 //var9 = ExtendedRenderer.rotEffRenderer.renderer.getTexture("/terrain.png");
-                mc.func_110434_K().func_110577_a(TextureMap.field_110575_b/*ClientProxy.resTerrain*/);
+                mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture/*ClientProxy.resTerrain*/);
                 //GL11.glBindTexture(3553, var9);
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 //GL11.glColor4f(0.2F, 0.9F, 0.2F, 0.1F);
-                
+                //GL11.glDepthMask(true);
                 //wr.loadTexture("/terrain.png");
                 //GL11.glDisable(GL11.GL_LIGHTING);
                 GL11.glDisable(GL11.GL_CULL_FACE);
@@ -3396,7 +3404,7 @@ public class WeatherMod implements Runnable
                                 //if (worldRef.rand.nextInt(2) == 0) {
                                 bdp.height = (height);
                                 //}
-                                wr.vboRender(block, (float)var1, height, str, magnitude, angle, waveTime, xx, zz, var3, var7, var4, var5, var6);
+                                wr.vboRender(block, var1, height, str, magnitude, angle, waveTime, xx, zz, var3, var7, var4, var5, var6);
                             }
                         }
                     }
@@ -3410,6 +3418,11 @@ public class WeatherMod implements Runnable
                 GL11.glDisable(GL11.GL_BLEND);
                 //GL11.glEnable(GL11.GL_LIGHTING);
                 GL11.glEnable(GL11.GL_CULL_FACE);
+                
+                //only Y needed atm
+                WaveRenderer.renderXlast = (float) player.posX;
+                WaveRenderer.renderYlast = (float) player.posY;
+                WaveRenderer.renderZlast = (float) player.posZ;
             }
 
             //
@@ -3499,7 +3512,8 @@ public class WeatherMod implements Runnable
             return;
         }
 
-        
+        //TEMP!!!!
+        if (stormClusters.size() >= 1) return;
         
         StormCluster sc = new StormCluster();
         sc.type = type;

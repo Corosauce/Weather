@@ -8,7 +8,8 @@ public class SoundLoader {
 	@ForgeSubscribe
     public void onSound(SoundLoadEvent event) {
 		
-		registerSound(event.manager, WeatherMod.modID + ":tornado/destruction.ogg");
+		//registerSound(event.manager, WeatherMod.modID + ":tornado/destruction.ogg");
+		registerSound(event.manager, WeatherMod.modID + ":waterfall.ogg");
 		registerStreaming(event.manager, WeatherMod.modID + ":tornado/destruction_0_.ogg");
 		registerStreaming(event.manager, WeatherMod.modID + ":tornado/destruction_1_.ogg");
 		registerStreaming(event.manager, WeatherMod.modID + ":tornado/destruction_2_.ogg");

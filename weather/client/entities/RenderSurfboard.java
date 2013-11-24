@@ -7,6 +7,7 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
+import weather.WeatherMod;
 import weather.entities.EntitySurfboard;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -24,8 +25,12 @@ public class RenderSurfboard extends Render
     }
 
 	@Override
-	protected ResourceLocation func_110775_a(Entity entity) {
-		return new ResourceLocation("/coro/weather/SurfBoard.png");
+
+	/**
+	 * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+	 */
+	protected ResourceLocation getEntityTexture(Entity entity) {
+		return new ResourceLocation(WeatherMod.modID + ":textures/entities/SurfBoard.png");
 	}
 
     /**
@@ -33,6 +38,7 @@ public class RenderSurfboard extends Render
      */
     public void renderBoat(EntitySurfboard par1EntityBoat, double par2, double par4, double par6, float par8, float par9)
     {
+    	this.bindEntityTexture(par1EntityBoat);
         GL11.glPushMatrix();
         GL11.glTranslatef((float)par2, (float)par4, (float)par6);
         GL11.glRotatef(270.0F - par8, 0.0F, 1.0F, 0.0F);

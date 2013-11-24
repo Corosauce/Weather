@@ -2,6 +2,7 @@ package weather.entities.particles;
 
 import java.awt.Color;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.src.ModLoader;
 import net.minecraft.world.World;
@@ -169,11 +170,11 @@ public class EntityAnimTexFX extends EntityRotFX
         //var14 += j;
         //var15 += k;
         //System.out.println("!!!");
-        float var16 = /*this.getEntityBrightness(var2) * */brightness;
-        //var16 = (Minecraft.getMinecraft().gameSettings.gammaSetting) - (this.worldObj.calculateSkylightSubtracted(var2) * 0.F);
-        float adjSubtracted = (this.worldObj.calculateSkylightSubtracted(var2) / 15F) * 0.5F;
-        var16 = 0.4F - adjSubtracted + (ModLoader.getMinecraftInstance().gameSettings.gammaSetting * 0.7F);
         
+        Minecraft mc = Minecraft.getMinecraft();
+        float br = ((0.9F + (mc.gameSettings.gammaSetting * 0.1F)) - (mc.theWorld.calculateSkylightSubtracted(var2) * 0.03F)) * mc.theWorld.getSunBrightness(1F);
+        br = 0.55F * Math.max(0.3F, br) * (2F);
+        		
         //var16 -= 0.5F;
         //var16 += 0.3F;
         
@@ -190,7 +191,7 @@ public class EntityAnimTexFX extends EntityRotFX
         	//System.out.println("gamma: " + gamma);
         }
         
-        var1.setColorRGBA_F(this.particleRed * var16, this.particleGreen * var16, this.particleBlue * var16, Math.max(0F, gamma));
+        var1.setColorRGBA_F(this.particleRed * br, this.particleGreen * br, this.particleBlue * br, Math.max(0F, gamma));
         var1.addVertexWithUV((double)(var13 - var3 * var12 - var6 * var12), (double)(var14 - var4 * var12), (double)(var15 - var5 * var12 - var7 * var12 - 0F), (double)var9, (double)var11);
         var1.addVertexWithUV((double)(var13 - var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 - var5 * var12 + var7 * var12 - 0F), (double)var9, (double)var10);
         var1.addVertexWithUV((double)(var13 + var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 + var5 * var12 + var7 * var12 + 0F), (double)var8, (double)var10);

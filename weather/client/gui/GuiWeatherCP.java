@@ -50,7 +50,7 @@ public class GuiWeatherCP extends GuiScreen
         //int var4 = this.mc.renderEngine.getTexture("/coro/weather/weatherGui.png");
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         //this.mc.renderEngine.bindTexture("/coro/weather/weatherGui.png");
-        mc.func_110434_K().func_110577_a(resGUI);
+        mc.getTextureManager().bindTexture(resGUI);
         //GL11.glBindTexture(GL11.GL_TEXTURE_2D, var4);
         int var5 = (this.width - this.xSize) / 2;
         int var6 = (this.height - this.ySize) / 2;

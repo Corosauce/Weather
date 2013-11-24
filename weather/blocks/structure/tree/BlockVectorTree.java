@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -26,6 +27,12 @@ public class BlockVectorTree extends BlockContainer
         
     }
     
+    @Override
+    public void registerIcons(IconRegister registry) {
+    	this.blockIcon = Block.wood.getIcon(0, 0);
+    }
+    
+    @Override
     public Icon getIcon(int par1, int par2)
     {
         return Block.wood.getIcon(par1, par2);

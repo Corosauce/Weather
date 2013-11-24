@@ -23,7 +23,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class EntityBuoyant extends Entity
 {
     private boolean field_70279_a;
-    private double field_70276_b;
+    private double speedMultiplier;
     private int boatPosRotationIncrements;
     private double boatX;
     private double boatY;
@@ -41,7 +41,7 @@ public class EntityBuoyant extends Entity
     {
         super(par1World);
         this.field_70279_a = true;
-        this.field_70276_b = 0.2D;
+        this.speedMultiplier = 0.2D;
         this.preventEntitySpawning = true;
         this.setSize(1.5F, 0.6F);
         this.yOffset = this.height / 2.0F;
@@ -111,13 +111,14 @@ public class EntityBuoyant extends Entity
     /**
      * Called when the entity is attacked.
      */
-    public boolean attackEntityFrom(DamageSource par1DamageSource, int par2)
+    @Override
+    public boolean attackEntityFrom(DamageSource par1DamageSource, float par2)
     {
         if (!this.worldObj.isRemote && !this.isDead)
         {
             this.setForwardDirection(-this.getForwardDirection());
             this.setTimeSinceHit(10);
-            this.setDamageTaken(this.getDamageTaken() + par2 * 10);
+            this.setDamageTaken((int)(this.getDamageTaken() + par2 * 10));
             this.setBeenAttacked();
 
             if (par1DamageSource.getEntity() instanceof EntityPlayer && ((EntityPlayer)par1DamageSource.getEntity()).capabilities.isCreativeMode)
@@ -405,8 +406,8 @@ public class EntityBuoyant extends Entity
 
             if (this.riddenByEntity != null)
             {
-                this.motionX += this.riddenByEntity.motionX * this.field_70276_b;
-                this.motionZ += this.riddenByEntity.motionZ * this.field_70276_b;
+                this.motionX += this.riddenByEntity.motionX * this.speedMultiplier;
+                this.motionZ += this.riddenByEntity.motionZ * this.speedMultiplier;
             }
 
             var6 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
@@ -420,22 +421,22 @@ public class EntityBuoyant extends Entity
                 var6 = maxSpeed;
             }
 
-            if (var6 > var24 && this.field_70276_b < maxSpeed)
+            if (var6 > var24 && this.speedMultiplier < maxSpeed)
             {
-                this.field_70276_b += (maxSpeed - this.field_70276_b) / 35.0D;
+                this.speedMultiplier += (maxSpeed - this.speedMultiplier) / 35.0D;
 
-                if (this.field_70276_b > maxSpeed)
+                if (this.speedMultiplier > maxSpeed)
                 {
-                    this.field_70276_b = maxSpeed;
+                    this.speedMultiplier = maxSpeed;
                 }
             }
             else
             {
-                this.field_70276_b -= (this.field_70276_b - 0.07D) / 35.0D;
+                this.speedMultiplier -= (this.speedMultiplier - 0.07D) / 35.0D;
 
-                if (this.field_70276_b < 0.07D)
+                if (this.speedMultiplier < 0.07D)
                 {
-                    this.field_70276_b = 0.07D;
+                    this.speedMultiplier = 0.07D;
                 }
             }
 
@@ -577,7 +578,8 @@ public class EntityBuoyant extends Entity
     /**
      * Called when a player interacts with a mob. e.g. gets milk from a cow, gets into the saddle on a pig.
      */
-    public boolean interact(EntityPlayer par1EntityPlayer)
+    @Override
+    public boolean interactFirst(EntityPlayer par1EntityPlayer)
     {
         if (this.riddenByEntity != null && this.riddenByEntity instanceof EntityPlayer && this.riddenByEntity != par1EntityPlayer)
         {

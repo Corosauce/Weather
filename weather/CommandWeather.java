@@ -25,7 +25,7 @@ public class CommandWeather extends CommandBase {
 			if (var2.length < 2)
 	        {
 				//exception throws dont seem to always get sent to player, do it manually
-				var1.sendChatToPlayer(ChatMessageComponent.func_111077_e("Invalid usage, example: '/wm spawn tornado"));
+				var1.sendChatToPlayer(ChatMessageComponent.createFromTranslationKey("Invalid usage, example: '/wm spawn tornado"));
 	            throw new WrongUsageException("Invalid usage");
 	        }
 	        else
@@ -38,11 +38,11 @@ public class CommandWeather extends CommandBase {
 	        				type = Integer.valueOf(var2[2]);
 	        			}
 	        			if (type > 5) {
-	        				var1.sendChatToPlayer(ChatMessageComponent.func_111077_e("use type 5 or less"));
+	        				var1.sendChatToPlayer(ChatMessageComponent.createFromTranslationKey("use type 5 or less"));
 	        			}
 	        			EntityPlayer entP = (EntityPlayer)var1;
 	        			WeatherMod.tryTornadoSpawn(entP.dimension, true, entP.username, type);
-	        			var1.sendChatToPlayer(ChatMessageComponent.func_111077_e("Spawning tornado type: " + type));
+	        			var1.sendChatToPlayer(ChatMessageComponent.createFromTranslationKey("Spawning tornado type: " + type));
 	        		}
 	        	}
 	        	

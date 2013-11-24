@@ -2,6 +2,7 @@ package weather.entities.particles;
 
 import java.awt.Color;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.src.ModLoader;
 import net.minecraft.world.World;
@@ -100,9 +101,14 @@ public class EntityFallingRainFX extends EntityRotFX implements WindHandler
         }*/
         //System.out.println(var12);
         
-        float var16 = this.getBrightness(var2) * brightness;
-        var16 = (1.3F + ModLoader.getMinecraftInstance().gameSettings.gammaSetting) - (this.worldObj.calculateSkylightSubtracted(var2) * 0.13F);
-        var1.setColorRGBA_F(this.particleRed * var16, this.particleGreen * var16, this.particleBlue * var16, 0.5F);
+        //float var16 = this.getBrightness(var2) * brightness;
+        //var16 = (1.3F + ModLoader.getMinecraftInstance().gameSettings.gammaSetting) - (this.worldObj.calculateSkylightSubtracted(var2) * 0.13F);
+        
+        Minecraft mc = Minecraft.getMinecraft();
+        float br = ((0.9F + (mc.gameSettings.gammaSetting * 0.1F)) - (mc.theWorld.calculateSkylightSubtracted(var2) * 0.03F)) * mc.theWorld.getSunBrightness(1F);
+        br = 0.35F * Math.max(0.3F, br) * (2F);
+        
+        var1.setColorRGBA_F(this.particleRed * br, this.particleGreen * br, this.particleBlue * br, 0.5F);
         
         WeatherMod.instance.rainDrops = 1 + ((WeatherMod.stormMan.stage-1) * 3);
         

@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 
 import net.minecraft.client.renderer.culling.Frustrum;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.client.settings.EnumOptions;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -23,6 +24,8 @@ import weather.entities.EntDrill;
 import weather.entities.EntShockWave;
 import weather.entities.EntWorm;
 import weather.entities.storm.EntTornado;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemTornado extends Item
 {
@@ -36,10 +39,18 @@ public class ItemTornado extends Item
         this.setMaxDamage(190);
     }
     
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IconRegister par1IconRegister) {
+		this.itemIcon = Item.silk.getIconFromDamage(0);
+	}
+    
+    @Override
     public Icon getIconFromDamage(int par1) {
     	return Item.silk.getIconFromDamage(0);
     }
 
+	@Override
     public ItemStack onItemRightClick(ItemStack var1, World var2, EntityPlayer var3)
     {
         var2.playSoundAtEntity(var3, "random.pop", 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 0.8F));

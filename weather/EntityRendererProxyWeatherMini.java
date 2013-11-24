@@ -143,7 +143,7 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.01F);
-            this.mc.func_110434_K().func_110577_a(resRain);
+            this.mc.getTextureManager().bindTexture(resRain);
             //GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/environment/snow.png"));
             double var9 = var41.lastTickPosX + (var41.posX - var41.lastTickPosX) * (double)par1;
             double var11 = var41.lastTickPosY + (var41.posY - var41.lastTickPosY) * (double)par1;
@@ -248,7 +248,7 @@ public class EntityRendererProxyWeatherMini extends EntityRendererProxy
                                     }
 
                                     var18 = 1;
-                                    this.mc.func_110434_K().func_110577_a(resSnow);
+                                    this.mc.getTextureManager().bindTexture(resSnow);
                                     //GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/environment/snow.png"));
                                     var8.startDrawingQuads();
                                 }

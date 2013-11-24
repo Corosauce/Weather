@@ -3,6 +3,7 @@ package weather.config;
 import java.io.File;
 
 import modconfig.IConfigCategory;
+import weather.WeatherMod;
 import weather.WeatherUtil;
 
 
@@ -17,9 +18,10 @@ public class ConfigTornado implements IConfigCategory {
 	public static int Storm_Tornado_rarityOfBreakOnFall = 5;
 	public static boolean Storm_Tornado_grabPlayer = true;
 	public static boolean Storm_Tornado_grabBlocks = true;
-	public static boolean Storm_Tornado_blockStrengthGrabbing = true;
-	public static boolean Storm_Tornado_blockBlacklistMode = false;
-	public static String Storm_Tornado_blockList = "2,3,5,6,12,31,18,20,35,43,44,53,79,87";
+	public static boolean Storm_Tornado_GrabCond_StrengthGrabbing = true;
+	public static boolean Storm_Tornado_GrabCond_List = false;
+	public static boolean Storm_Tornado_GrabListBlacklistMode = false;
+	public static String Storm_Tornado_GrabList = "";
 	public static double Storm_Tornado_oddsOfTornadoTo1 = 20;
 	public static double Storm_Tornado_minDaysBetweenTornado = 10;
 	public static boolean Storm_Tornado_oldParticles = false;
@@ -51,8 +53,7 @@ public class ConfigTornado implements IConfigCategory {
 
 	@Override
 	public void hookUpdatedValues() {
-		// TODO Auto-generated method stub
-		
+		WeatherMod.doBlockList();
 	}
 
 }

@@ -22,12 +22,16 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import weather.WeatherEntityConfig;
 import weather.WeatherMod;
+import weather.WeatherUtil;
 import weather.config.ConfigTornado;
 import weather.config.ConfigWavesMisc;
 import weather.entities.MovingBlock;
 import weather.system.wind.WindHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import extendedrenderer.ExtendedRenderer;
+import extendedrenderer.particle.ParticleRegistry;
+import extendedrenderer.particle.entity.EntityRotFX;
 //@SideOnly(Side.CLIENT)
 public class EntTornado extends Entity implements WindHandler
 {
@@ -1250,21 +1254,15 @@ public class EntTornado extends Entity implements WindHandler
 	                else
 	                {
 	                    WeatherMod.proxy.newAnimParticle("AnimTexFX", worldObj, this, tryX2, posY, tryZ2, 0, 0, 0, 9.5D, WeatherMod.effWindAnimID, colorID, scale);
-	                    //WeatherMod.proxy.newParticle("WindFX", worldObj, this, tryX2, posY, tryZ2, 0, 0, 0, 9.5D, colorID);
-	                    //derp
-	                    /*c_w_EntityRotFX var32 = null;
-	                    var32 = new c_w_EntityAnimTexFX(this.worldObj, 0, 0, 0, 0, 0, 0, 8D, WeatherMod.effWindAnimID, colorID);
-	                    mod_ExtendedRenderer.rotEffRenderer.addEffect(var32);
-	                    this.funnelEffects.add(var32);
+	                    
+	                    /*EntityRotFX var31 = WeatherMod.pm.spawnNewParticleIconFX(worldObj, ParticleRegistry.cloud, tryX2, posY, tryZ2, 0, 0, 0);
 	                    WeatherMod.particleCount++;
-	                    var32.renderDistanceWeight = 1000.0D;
-	                    var32.noClip = true;
-	                    var32.setSize(1.25F, 1.25F);
-	                    var32.posY = var6 + 0D;
-	                    var32.setPosition(tryX2, spawnYOffset, tryZ2);*/
+	                    var31.setPosition(posX, posY+20, posZ);
+	                    var31.callUpdatePB = false;
+	                    var31.particleScale = 500F;
+				        ExtendedRenderer.rotEffRenderer.addEffect(var31);
+	                    funnelEffects.add(var31);*/
 	                }
-	
-	                //}
 	            }
 	
 	            for (int i = 0; i < 5; i++)
@@ -1274,16 +1272,7 @@ public class EntTornado extends Entity implements WindHandler
 	
 	                if (worldObj.getBlockId((int)tryX2, (int)posY - 1, (int)tryZ2) != 0)
 	                {
-	                    WeatherMod.proxy.newParticle("WindFX", worldObj, this, tryX2, this.posY, tryZ2, 0, 0, 0, 9.5D, 0);
-	                    /*var31 = new c_w_EntityWindFX(this.worldObj, d + (double)f8 * d4, d1 + (double)f9 * d4, d2 + (double)f10 * d4, d6 / 2D, d7 / 2D, d8 / 2D, 9.5D, 0);
-	                    this.effR.addEffect(var31);
-	                    this.funnelEffects.add(var31);
-	                    WeatherMod.particleCount++;
-	                    var31.renderDistanceWeight = 10.0D;
-	                    var31.noClip = true;
-	                    var31.setSize(1.25F, 1.25F);
-	                    var31.posY = var6 + 0D;
-	                    var31.setPosition(tryX2, this.posY, tryZ2);*/
+	                    //WeatherMod.proxy.newParticle("WindFX", worldObj, this, tryX2, this.posY, tryZ2, 0, 0, 0, 9.5D, 0);
 	                }
 	            }
 	        }

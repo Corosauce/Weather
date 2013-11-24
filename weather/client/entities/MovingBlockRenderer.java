@@ -28,13 +28,17 @@ public class MovingBlockRenderer extends Render
     }
 
 	@Override
-	protected ResourceLocation func_110775_a(Entity entity) {
-		return TextureMap.field_110575_b;
+
+	/**
+	 * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+	 */
+	protected ResourceLocation getEntityTexture(Entity entity) {
+		return TextureMap.locationBlocksTexture;
 	}
 
     public void a(MovingBlock var1, double var2, double var4, double var6, float var8, float var9)
     {
-    	func_110777_b(var1);
+    	bindEntityTexture(var1);
         GL11.glPushMatrix();
         GL11.glTranslatef((float)var2, (float)var4, (float)var6);
         //this.loadTexture("/terrain.png");

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import CoroAI.util.CoroUtilEntity;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
@@ -16,6 +18,8 @@ import weather.system.wind.WindHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import extendedrenderer.ExtendedRenderer;
+import extendedrenderer.particle.ParticleRegistry;
+import extendedrenderer.particle.entity.EntityIconFX;
 import extendedrenderer.particle.entity.EntityRotFX;
 @SideOnly(Side.CLIENT)
 public class StormCluster extends Entity implements WindHandler
@@ -23,7 +27,7 @@ public class StormCluster extends Entity implements WindHandler
     public World worldRef;
     public List cloudEffects;
     public int age;
-    public int maxAge = 900;
+    public int maxAge = 5000;
 
     public static int updateLCG;
     
@@ -79,7 +83,7 @@ public class StormCluster extends Entity implements WindHandler
         var4 = MathHelper.floor_double(posZ / 16.0D);
         byte var5 = radius;
 
-        for (int var66 = -var5; var66 <= var5; ++var66)
+        /*for (int var66 = -var5; var66 <= var5; ++var66)
         {
             for (int var77 = -var5; var77 <= var5; ++var77)
             {
@@ -114,15 +118,72 @@ public class StormCluster extends Entity implements WindHandler
                     WeatherMod.particleCount2++;
                     //EntityCloud ent = new EntityCloud(worldRef);
                     //ent.setPosition(var7, var9, var8);
-                    /*ent.motionX = ent.rand.nextFloat()*2-1;
+                    ent.motionX = ent.rand.nextFloat()*2-1;
                     ent.motionY = ent.rand.nextFloat()*2-1;
-                    ent.motionZ = ent.rand.nextFloat()*2-1;*/
+                    ent.motionZ = ent.rand.nextFloat()*2-1;
                     //ent.setPosition((double)var7, (double)var9, (double)var8);
                     //worldRef.addWeatherEffect(ent);
                     //}
                 }
             }
+        }*/
+        
+        int xMax = 100;
+        int zMax = 100;
+        int inc = 10;
+        Random rand = new Random();
+        
+        if (cloudEffects.size() < 200) {
+        	for (int xx = 0; xx < xMax; xx+=inc) {
+        		for (int zz = 0; zz < zMax; zz+=inc) {
+        			
+        			if (rand.nextInt(150) != 0) continue;
+        			
+        			//old way
+			        EntityAnimTexFX var31 = new EntityAnimTexFX(worldRef, posX, posY, posZ, worldRef.rand.nextGaussian() * 0.8D, worldRef.rand.nextGaussian() * 0.8D, worldRef.rand.nextGaussian() * 0.8D, 20D, WeatherMod.effWindAnimID);
+			        var31.spawnY = ((int)200 - 5) + rand.nextFloat() * 5;
+			        //this.effR.addEffect(var31);
+			        //this.funnelEffects.add(var31);
+			        //mod_EntMover.particleCount++;
+			        var31.rotationPitch = -90F;
+			        var31.renderDistanceWeight = 10.0D;
+			        var31.noClip = true;
+			        var31.setSize(1.25F, 1.25F);
+			        //var31.posY = var6 + 0D;
+			        var31.setPosition(posX + xx - xMax/2, var31.spawnY, posZ + zz - zMax/2);
+			        var31.type = 1;
+        			
+        			
+        			//new way - no
+        			/*float speed = 1F;
+        			EntityRotFX var31 = new EntityIconFX(worldObj, posX + rand.nextDouble(), posY + 0.0D + rand.nextDouble() * 1.5D, posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D(rand.nextDouble() - rand.nextDouble()) * speed, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.cloud);
+        			var31.spawnY = ((int)128 - 5) + rand.nextFloat() * 5;
+        			var31.rotationPitch = 90F;
+			        var31.renderDistanceWeight = 10.0D;
+			        var31.noClip = true;
+			        var31.setSize(5.25F, 5.25F);
+			        var31.particleScale = 75F;*/
+
+        			//real new way
+        			/*int topY = 180;
+        			int rangeY = 30;
+        			float speed = 1F;
+        			float spawnY = ((int)topY - rangeY) + rand.nextFloat() * rangeY;
+        			EntityRotFX var31 = WeatherMod.pm.spawnNewParticleIconFX(worldObj, ParticleRegistry.cloud, posX, spawnY, posZ, (rand.nextDouble() - rand.nextDouble()) * speed, (rand.nextDouble() - rand.nextDouble()) * speed, (rand.nextDouble() - rand.nextDouble()) * speed);
+        			WeatherMod.pm.setParticleCloud(var31, spawnY);
+        			var31.setPosition(posX + xx - xMax/2, var31.spawnY, posZ + zz - zMax/2);
+        			//EntityRotFX var31 = new EntityIconFX(worldObj, posX + rand.nextDouble(), posY + 0.0D + rand.nextDouble() * 1.5D, posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D(rand.nextDouble() - rand.nextDouble()) * speed, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.cloud);
+			        
+			        
+			        */
+			        ExtendedRenderer.rotEffRenderer.addEffect(var31);
+			        cloudEffects.add(var31);
+			        WeatherMod.particleCount2++;
+        		}
+        	}
         }
+        
+        //System.out.println("active clouds: " + cloudEffects.size());
         
         //Localized rain!
         for (int i = 0; i < 10; i++) {
@@ -157,27 +218,21 @@ public class StormCluster extends Entity implements WindHandler
                 }
                 else if (var30 != null)
                 {
+                	
+                	//var30.pb.tickUpdateCloud(var30);
+                	
                     WeatherMod.spin(this, (WeatherEntityConfig)WeatherMod.weatherEntTypes.get(type != 1 ? type : 2), var30);
-                    var30.motionX *= 0.99F;
-                    var30.motionZ *= 0.99F;
-                    //var30.setPosition(var30.posX, 127+var30.rand.nextDouble(), var30.posZ);
-                    //var30.setPosition(var30.posX, var30.spawnY/*var30.posY+0.4*/, var30.posZ);
                     
-                    if (false && worldObj.getWorldTime() % 2 == 0) {
-	                    int size = 1;
-	                    
-	                    Random rand = new Random();
-	                    
-	                    EntityRotFX ent = new EntityFallingRainFX(worldRef, (double)var30.posX + rand.nextInt(size) - (size / 2), (double)var30.posY + 10, (double)var30.posZ + rand.nextInt(size) - (size / 2), 0D, -1D/*-5D - (rand.nextInt(5) * -1D)*/, 0D, 2.0D, 3);
-	                    ent.renderDistanceWeight = 1.0D;
-	                    ent.setSize(1.2F, 1.2F);
-	                    ent.rotationYaw = rand.nextInt(360) - 180F;
-	                    ent.setGravity(0.1F);
-	                    
-	                    ent.spawnAsWeatherEffect();
-	                    
-	                    //WeatherMod.instance.spawnQueue.add(ent);
-                    }
+                    
+                    //var30.motionX *= 0.995F;
+                    //var30.motionZ *= 0.995F;
+                }
+                
+                float distCur = var30.getDistanceToEntity(this);
+                float distMax = cloudEffects.size() * 0.7F;
+                
+                if (distCur > distMax) {
+                	CoroUtilEntity.moveTowards(var30, this, 0.03F);
                 }
             }
         }
@@ -197,7 +252,7 @@ public class StormCluster extends Entity implements WindHandler
                 EntityRotFX var30 = (EntityRotFX)cloudEffects.get(var99);
                 //var30.setAge(9999999);
                 var30.setDead();
-                cloudEffects.remove(var30);
+                //cloudEffects.remove(var30);
                 //mod_ExtendedRenderer.rotEffRenderer.fxLayers[4].remove(var30);
             }
         }

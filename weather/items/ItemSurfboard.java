@@ -3,7 +3,10 @@ package weather.items;
 import java.util.Iterator;
 import java.util.List;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,6 +30,13 @@ public class ItemSurfboard extends Item
         this.setCreativeTab(CreativeTabs.tabTransport);
     }
     
+	@Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IconRegister par1IconRegister) {
+		this.itemIcon = Item.boat.getIconFromDamage(0);
+	}
+    
+	@Override
     public Icon getIconFromDamage(int par1) {
     	return Item.boat.getIconFromDamage(0);
     }
@@ -34,6 +44,7 @@ public class ItemSurfboard extends Item
     /**
      * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
      */
+	@Override
     public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)
     {
         float var4 = 1.0F;

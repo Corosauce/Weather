@@ -209,7 +209,7 @@ public class WeatherUtil
         {
             if (ent.worldObj.isRemote)
             {
-                return hmm();
+                return !ent.isCollidedHorizontally && hmm();
             }
             else
             {
