@@ -4,22 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import CoroAI.util.CoroUtilEntity;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import weather.WeatherEntityConfig;
 import weather.WeatherMod;
+import weather.config.ConfigTornado;
 import weather.entities.particles.EntityAnimTexFX;
-import weather.entities.particles.EntityFallingRainFX;
 import weather.system.wind.WindHandler;
+import CoroUtil.util.CoroUtilEntity;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.ParticleRegistry;
-import extendedrenderer.particle.entity.EntityIconFX;
+import extendedrenderer.particle.behavior.ParticleBehaviorFog;
 import extendedrenderer.particle.entity.EntityRotFX;
 @SideOnly(Side.CLIENT)
 public class StormCluster extends Entity implements WindHandler
@@ -32,6 +34,8 @@ public class StormCluster extends Entity implements WindHandler
     public static int updateLCG;
     
     public int type = 0;
+    
+	public ParticleBehaviorFog particleBehaviorFog;
 
     public StormCluster()
     {
@@ -66,6 +70,15 @@ public class StormCluster extends Entity implements WindHandler
     {
     	
     	if (!worldObj.isRemote) return;
+    	
+    	if (particleBehaviorFog == null) {
+			particleBehaviorFog = new ParticleBehaviorFog(Vec3.createVectorHelper(posX, posY, posZ));
+			particleBehaviorFog.sourceEntity = this;
+		} else {
+			if (!Minecraft.getMinecraft().isSingleplayer() || !(Minecraft.getMinecraft().currentScreen instanceof GuiIngameMenu)) {
+				particleBehaviorFog.tickUpdateList();
+			}
+		}
     	
         //Entity target = null;//mod_EntMover.activeTornado;
         byte radius = 3;
@@ -133,25 +146,27 @@ public class StormCluster extends Entity implements WindHandler
         int inc = 10;
         Random rand = new Random();
         
-        if (cloudEffects.size() < 200) {
+        if (cloudEffects.size() < 500) {
         	for (int xx = 0; xx < xMax; xx+=inc) {
         		for (int zz = 0; zz < zMax; zz+=inc) {
         			
         			if (rand.nextInt(150) != 0) continue;
         			
         			//old way
-			        EntityAnimTexFX var31 = new EntityAnimTexFX(worldRef, posX, posY, posZ, worldRef.rand.nextGaussian() * 0.8D, worldRef.rand.nextGaussian() * 0.8D, worldRef.rand.nextGaussian() * 0.8D, 20D, WeatherMod.effWindAnimID);
-			        var31.spawnY = ((int)200 - 5) + rand.nextFloat() * 5;
-			        //this.effR.addEffect(var31);
-			        //this.funnelEffects.add(var31);
-			        //mod_EntMover.particleCount++;
-			        var31.rotationPitch = -90F;
-			        var31.renderDistanceWeight = 10.0D;
-			        var31.noClip = true;
-			        var31.setSize(1.25F, 1.25F);
-			        //var31.posY = var6 + 0D;
-			        var31.setPosition(posX + xx - xMax/2, var31.spawnY, posZ + zz - zMax/2);
-			        var31.type = 1;
+        			if (!ConfigTornado.Storm_Tornado_hdParticles) {
+				        EntityAnimTexFX var31 = new EntityAnimTexFX(worldRef, posX, posY, posZ, worldRef.rand.nextGaussian() * 0.8D, worldRef.rand.nextGaussian() * 0.8D, worldRef.rand.nextGaussian() * 0.8D, 20D, WeatherMod.effWindAnimID);
+				        var31.spawnY = ((int)200 - 5) + rand.nextFloat() * 5;
+				        var31.rotationPitch = -90F;
+				        var31.renderDistanceWeight = 10.0D;
+				        var31.noClip = true;
+				        var31.setSize(1.25F, 1.25F);
+				        var31.setPosition(posX + xx - xMax/2, var31.spawnY, posZ + zz - zMax/2);
+				        var31.type = 1;
+				        
+				        ExtendedRenderer.rotEffRenderer.addEffect(var31);
+				        cloudEffects.add(var31);
+				        WeatherMod.particleCount2++;
+        			}
         			
         			
         			//new way - no
@@ -176,12 +191,21 @@ public class StormCluster extends Entity implements WindHandler
 			        
 			        
 			        */
-			        ExtendedRenderer.rotEffRenderer.addEffect(var31);
-			        cloudEffects.add(var31);
-			        WeatherMod.particleCount2++;
+			        /**/
         		}
         	}
         }
+
+    	//new new new way
+    	//not using cloudEffects for now
+    	if (ConfigTornado.Storm_Tornado_hdParticles) {
+    		double createRange = 500;
+    		double createRangeY = 30;
+    		double spawnX = posX + rand.nextDouble() * createRange - rand.nextDouble() * createRange;
+    		double spawnZ = posZ + rand.nextDouble() * createRange - rand.nextDouble() * createRange;
+    		EntityRotFX particle = spawnFogParticle(spawnX, posY, spawnZ);
+    		WeatherMod.particleCount2++;
+    	}
         
         //System.out.println("active clouds: " + cloudEffects.size());
         
@@ -238,6 +262,21 @@ public class StormCluster extends Entity implements WindHandler
         }
         
         //setDead();
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public EntityRotFX spawnFogParticle(double x, double y, double z) {
+    	double speed = 0D;
+    	EntityRotFX entityfx = particleBehaviorFog.spawnNewParticleIconFX(Minecraft.getMinecraft().theWorld, ParticleRegistry.cloud256, x, y, z, (rand.nextDouble() - rand.nextDouble()) * speed, 0.0D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed);
+		particleBehaviorFog.initParticle(entityfx);
+		//lock y
+		//entityfx.spawnY = (float) entityfx.posY;
+		entityfx.spawnY = ((int)200 - 5) + rand.nextFloat() * 5;
+    	entityfx.callUpdatePB = false;
+		//ExtendedRenderer.rotEffRenderer.addEffect(entityfx);
+		entityfx.spawnAsWeatherEffect();
+		particleBehaviorFog.particles.add(entityfx);
+		return entityfx;
     }
 
     @Override

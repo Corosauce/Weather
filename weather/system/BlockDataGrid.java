@@ -48,6 +48,7 @@ public class BlockDataGrid
         {
             BlockDataPoint newVec = new BlockDataPoint(i, j, k);
             grid.put(newVec.hash, newVec);
+            //System.out.println(this + " - weather grid had addition, new size: " + grid.size());
             return newVec;
         }
         else

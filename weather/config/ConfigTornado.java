@@ -24,7 +24,7 @@ public class ConfigTornado implements IConfigCategory {
 	public static String Storm_Tornado_GrabList = "";
 	public static double Storm_Tornado_oddsOfTornadoTo1 = 20;
 	public static double Storm_Tornado_minDaysBetweenTornado = 10;
-	public static boolean Storm_Tornado_oldParticles = false;
+	public static boolean Storm_Tornado_hdParticles = false;
 	public static boolean Storm_Tornado_makeClouds = true;
 	public static boolean Storm_Lightning_active = true;
 	public static int Storm_Tornado_maxActive = 1;

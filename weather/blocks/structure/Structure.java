@@ -9,10 +9,10 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import weather.WeatherMod;
-import CoroAI.PathEntityEx;
-import CoroAI.entity.EnumActState;
-import CoroAI.entity.EnumJob;
-import CoroAI.entity.JobManager;
+import CoroUtil.componentAI.jobSystem.JobManager;
+import CoroUtil.entity.EnumActState;
+import CoroUtil.entity.EnumJob;
+import CoroUtil.pathfinding.PathEntityEx;
 
 public class Structure extends EntityLiving
 {
@@ -358,7 +358,7 @@ public class Structure extends EntityLiving
 		}*/
 		//System.out.println("init job " + job);
 		
-		this.job.setPrimaryJob(job);
+		//this.job.setPrimaryJob(job);
 		
 		//this.job.swapJob(job);
 		this.job.clearJobs();
@@ -385,12 +385,12 @@ public class Structure extends EntityLiving
     
     public void swapJob(EnumJob job) {
 		setState(EnumActState.IDLE);
-		this.job.swapJob(job);
+		//this.job.swapJob(job);
 	}
 	
 	public void addJob(EnumJob job) {
 		//setState(EnumActState.IDLE);
-		this.job.addJob(job);
+		//this.job.addJob(job);
 	}
 	
 	public void setState(EnumActState eka) {

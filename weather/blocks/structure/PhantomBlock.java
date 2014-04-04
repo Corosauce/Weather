@@ -18,9 +18,9 @@ import net.minecraft.world.World;
 import weather.WeatherMod;
 import weather.config.ConfigTornado;
 import weather.system.wind.WindHandler;
-import CoroAI.PFQueue;
-import CoroAI.PathEntityEx;
-import CoroAI.c_IEnhPF;
+import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.pathfinding.PathEntityEx;
+import CoroUtil.pathfinding.c_IEnhPF;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;

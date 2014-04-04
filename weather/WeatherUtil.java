@@ -18,8 +18,8 @@ import net.minecraft.world.World;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-import CoroAI.c_CoroAIUtil;
-import CoroAI.entity.EntityTropicalFishHook;
+import CoroUtil.OldUtil;
+import CoroUtil.entity.EntityTropicalFishHook;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -274,12 +274,12 @@ public class WeatherUtil
 
     public static void setPrivateValueBoth(Class var0, Object var1, String obf, String mcp, Object var3)
     {
-    	c_CoroAIUtil.setPrivateValueBoth(var0, var1, obf, mcp, var3);
+    	OldUtil.setPrivateValueBoth(var0, var1, obf, mcp, var3);
     }
 
     public static Object getPrivateValueBoth(Class var0, Object var1, String obf, String mcp)
     {
-        return c_CoroAIUtil.getPrivateValueBoth(var0, var1, obf, mcp);
+        return OldUtil.getPrivateValueBoth(var0, var1, obf, mcp);
     }
 
     public static Object getPrivateValue(Class var0, Object var1, String var2) throws IllegalArgumentException, SecurityException, NoSuchFieldException

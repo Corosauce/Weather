@@ -20,7 +20,7 @@ public class ConfigWind implements IConfigCategory {
 	public static boolean Wind_Particle_snow = false;
 	public static boolean Wind_Particle_fire = false;
 	public static boolean TropicraftRealm_Wind_active;
-	public static double volWindScale = 0.5D;
+	public static double volWindScale = 0.05D;
 
 	@Override
 	public String getConfigFileName() {

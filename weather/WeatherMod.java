@@ -89,9 +89,9 @@ import weather.storm.StormManager;
 import weather.system.BlockDataPoint;
 import weather.system.WeatherManager;
 import weather.system.wind.WindHandler;
-import CoroAI.c_CoroAIUtil;
-import CoroAI.entity.EntityTropicalFishHook;
-import CoroAI.util.CoroUtilBlock;
+import CoroUtil.OldUtil;
+import CoroUtil.entity.EntityTropicalFishHook;
+import CoroUtil.util.CoroUtilBlock;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -116,7 +116,7 @@ import extendedrenderer.particle.entity.EntityTexBiomeColorFX;
 import extendedrenderer.particle.entity.EntityTexFX;
 
 @NetworkMod(channels = { "StormData", "WindData", "Tornado" }, clientSideRequired = true, serverSideRequired = true, packetHandler = WeatherPacketHandler.class, versionBounds = "[1.55,1.99)")
-@Mod(modid = "WeatherMod", name = "Weather and Tornadoes", version = "1.58")
+@Mod(modid = "WeatherMod", name = "Weather and Tornadoes", version = "1.591")
 
 public class WeatherMod implements Runnable
 {
@@ -873,7 +873,7 @@ public class WeatherMod implements Runnable
             "DD ", "   ", "   ", 'D', Block.cobblestone
         });*/
         //ModLoader.registerEntityID(c_w_EntityHail.class, "EntityHail", ModLoader.getUniqueEntityId());
-        ModLoader.registerEntityID(EntityCloud.class, "EntityCloud", ModLoader.getUniqueEntityId());
+        //ModLoader.registerEntityID(EntityCloud.class, "EntityCloud", ModLoader.getUniqueEntityId());
         //ModLoader.setInGUIHook(this, true, false);
         //ModLoader.setInGameHook(this, true, false);
         this.entToAge = new HashMap();
@@ -1513,14 +1513,14 @@ public class WeatherMod implements Runnable
                         } else {
                         	if (entity1 instanceof EntityPlayer) {
                         		if (entity1.worldObj.canBlockSeeTheSky((int)entity1.posX, (int)entity1.posY, (int)entity1.posZ) || 
-                        				c_CoroAIUtil.canEntSeeCoords(entity1, entity.posX, entity.posY + 20, entity.posZ) || 
-                        				c_CoroAIUtil.canEntSeeCoords(entity1, entity.posX, entity.posY + 50, entity.posZ) || 
-                        				c_CoroAIUtil.canEntSeeCoords(entity1, entity.posX, entity.posY + 80, entity.posZ)) {
+                        				OldUtil.canEntSeeCoords(entity1, entity.posX, entity.posY + 20, entity.posZ) || 
+                        				OldUtil.canEntSeeCoords(entity1, entity.posX, entity.posY + 50, entity.posZ) || 
+                        				OldUtil.canEntSeeCoords(entity1, entity.posX, entity.posY + 80, entity.posZ)) {
                         			spin(entity, conf, entity1);
                                     foundEnt = true;
                         			
                         		}
-                        	} else if (entity1 instanceof EntityLivingBase && c_CoroAIUtil.canEntSeeCoords(entity1, entity.posX, entity.posY + 80, entity.posZ)) {
+                        	} else if (entity1 instanceof EntityLivingBase && OldUtil.canEntSeeCoords(entity1, entity.posX, entity.posY + 80, entity.posZ)) {
                         		spin(entity, conf, entity1);
                                 foundEnt = true;
                         	}
@@ -2447,7 +2447,7 @@ public class WeatherMod implements Runnable
         	if (id > 0 && Block.blocksList[id].blockMaterial == Material.wood) {
         		float var5 = 0;
 
-        		var5 = (Float)c_CoroAIUtil.getPrivateValueSRGMCP(PlayerControllerMP.class, (PlayerControllerMP)ModLoader.getMinecraftInstance().playerController, c_CoroAIUtil.refl_curBlockDamageMP_obf, c_CoroAIUtil.refl_curBlockDamageMP_mcp);
+        		var5 = (Float)OldUtil.getPrivateValueSRGMCP(PlayerControllerMP.class, (PlayerControllerMP)ModLoader.getMinecraftInstance().playerController, OldUtil.refl_curBlockDamageMP_obf, OldUtil.refl_curBlockDamageMP_mcp);
 
                 if (var5 > 0) {
                 	shakeTrees(8);
@@ -3108,7 +3108,7 @@ public class WeatherMod implements Runnable
         //NEEEEEEEED TO STOP WIND WHEN UNDERGROUND!
         float volScaleFar = weatherMan.wind.strength * 1F;
 
-        if (weatherMan.wind.strength <= 0.03F)
+        if (weatherMan.wind.strength <= 0.07F)
         {
             volScaleFar = 0F;
         }

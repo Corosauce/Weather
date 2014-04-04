@@ -1,5 +1,6 @@
 package weather.entities.storm;
 
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ import java.util.Map;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.EntityLightningBolt;
@@ -22,7 +25,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import weather.WeatherEntityConfig;
 import weather.WeatherMod;
-import weather.WeatherUtil;
 import weather.config.ConfigTornado;
 import weather.config.ConfigWavesMisc;
 import weather.entities.MovingBlock;
@@ -31,6 +33,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.ParticleRegistry;
+import extendedrenderer.particle.behavior.ParticleBehaviorFog;
 import extendedrenderer.particle.entity.EntityRotFX;
 //@SideOnly(Side.CLIENT)
 public class EntTornado extends Entity implements WindHandler
@@ -107,6 +110,9 @@ public class EntTornado extends Entity implements WindHandler
     //public World worldRef;
     
     public float scale = 1F;
+    
+    @SideOnly(Side.CLIENT)
+	public ParticleBehaviorFog particleBehaviorFog;
 
     public EntTornado(World var1)
     {
@@ -817,6 +823,18 @@ public class EntTornado extends Entity implements WindHandler
 
         return false;
     }
+    
+    @SideOnly(Side.CLIENT)
+    public void tickParticleBehaviors() {
+    	if (particleBehaviorFog == null) {
+			particleBehaviorFog = new ParticleBehaviorFog(Vec3.createVectorHelper(posX, posY, posZ));
+			particleBehaviorFog.sourceEntity = this;
+		} else {
+			if (!Minecraft.getMinecraft().isSingleplayer() || !(Minecraft.getMinecraft().currentScreen instanceof GuiIngameMenu)) {
+				particleBehaviorFog.tickUpdateList();
+			}
+		}
+    }
 
     public void onUpdate()
     {
@@ -869,6 +887,8 @@ public class EntTornado extends Entity implements WindHandler
 
         if (worldObj.isRemote)
         {
+        	tickParticleBehaviors();
+        	
             if (ConfigTornado.Storm_Tornado_makeClouds && getStorm().type != getStorm().TYPE_SPOUT)
             {
             	//System.out.println(Math.max(1, 10 - (entConfID * 2)));
@@ -1185,9 +1205,9 @@ public class EntTornado extends Entity implements WindHandler
 	                itCount = 4;
 	            }
 	
-	            if (ConfigTornado.Storm_Tornado_oldParticles)
+	            if (ConfigTornado.Storm_Tornado_hdParticles)
 	            {
-	                itCount = 35;
+	                itCount = 3;
 	            }
 	
 	            for (int i = 0; i < itCount; i++)
@@ -1245,11 +1265,11 @@ public class EntTornado extends Entity implements WindHandler
 	                }
 	
 	                
-	                
-	                //HERE
-	                if (ConfigTornado.Storm_Tornado_oldParticles)
+	                if (ConfigTornado.Storm_Tornado_hdParticles)
 	                {
-	                    WeatherMod.proxy.newParticle("WindFX", worldObj, this, tryX2, posY, tryZ2, 0, 0, 0, 9.5D, colorID);
+	                    //WeatherMod.proxy.newParticle("WindFX", worldObj, this, tryX2, posY, tryZ2, 0, 0, 0, 9.5D, colorID);
+	                	spawnFogParticle(tryX2, posY, tryZ2, colorID);
+	                	
 	                }
 	                else
 	                {
@@ -1511,6 +1531,66 @@ public class EntTornado extends Entity implements WindHandler
 	            //pkt.isChunkDataPacket = true;
 	            MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(pkt);
 	        }
+        }
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void spawnFogParticle(double x, double y, double z, int colorID) {
+    	double speed = 0D;
+    	EntityRotFX entityfx = particleBehaviorFog.spawnNewParticleIconFX(Minecraft.getMinecraft().theWorld, ParticleRegistry.cloud256, x, y, z, (rand.nextDouble() - rand.nextDouble()) * speed, 0.0D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed);
+		particleBehaviorFog.initParticle(entityfx);
+		entityfx.particleScale = 200;
+		entityfx.setMaxAge(200);
+    	entityfx.callUpdatePB = false;
+		ExtendedRenderer.rotEffRenderer.addEffect(entityfx);
+		funnelEffects.add(entityfx);
+		WeatherMod.particleCount++;
+		//entityfx.spawnAsWeatherEffect();
+		particleBehaviorFog.particles.add(entityfx);
+		
+		//Color
+		
+		Color var17 = null;
+        
+        if (colorID == 0)
+        {
+        	float val = this.rand.nextFloat() * 0.3F;
+        	entityfx.setRBGColorF(val, val, val);
+        }
+        else if (colorID == 1)
+        {
+            var17 = new Color(7951674);
+        }
+        else if (colorID == 2)
+        {
+            var17 = new Color(14077848);
+        }
+        else if (colorID == 3)
+        {
+            var17 = new Color(10973);
+        }
+        else if (colorID == 4)
+        {
+            var17 = new Color(15663103);
+        }
+        else if (colorID == 5)
+        {
+            var17 = new Color(0xFFFFFF);
+        }
+        else if (colorID == 6)
+        {
+            var17 = Color.GREEN;
+        }
+
+        //this.brightness = 2.0F;
+
+        if (colorID != 0)
+        {
+        	entityfx.setRBGColorF((float)var17.getRed() / 255.0F, (float)var17.getGreen() / 255.0F, (float)var17.getBlue() / 255.0F);
+        }
+        else
+        {
+        	entityfx.setRBGColorF(0.7F, 0.7F, 0.7F);
         }
     }
     

@@ -81,7 +81,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 
         if (this.tileentity != null)
         {
-            var1.setBlockTileEntity(var2, var3, var4, ((BlockContainer)Block.blocksList[this.tile]).createNewTileEntity(var1));
+            //var1.setBlockTileEntity(var2, var3, var4, ((BlockContainer)Block.blocksList[this.tile]).createNewTileEntity(var1));
             var1.setBlock(var2, var3, var4, 0, 0, 2);
         }
     }

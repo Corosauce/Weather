@@ -145,7 +145,7 @@ public class ClientProxy extends CommonProxy
         rr.registerEntityRenderingHandler(EntWorm.class, new RenderWorm());
         rr.registerEntityRenderingHandler(EntTornado.class, new RenderTornado());
         rr.registerEntityRenderingHandler(EntityHail.class, new RenderHail(coord));
-        rr.registerEntityRenderingHandler(EntityCloud.class, new RenderCloud(coord));
+        //rr.registerEntityRenderingHandler(EntityCloud.class, new RenderCloud(coord)); --keep removed cause weird entity conflict, note these never actually get a non render registration, so whats going on?
         rr.registerEntityRenderingHandler(EntShockWave.class, new RenderTornado());
         rr.registerEntityRenderingHandler(EntDrill.class, new RenderTornado());
         rr.registerEntityRenderingHandler(MovingBlock.class, new MovingBlockRenderer());
